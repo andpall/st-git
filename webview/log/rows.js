@@ -29,8 +29,25 @@ function createRow(row, index, lanes) {
   return element;
 }
 
+function requestMore() {
+  vscode.postMessage({ type: 'more' });
+}
+
+function createLoadMore() {
+  const button = document.createElement('button');
+  button.className = 'load-more';
+  button.textContent = 'Load more commits';
+  button.addEventListener('click', requestMore);
+  return button;
+}
+
 function render() {
+  if (!rows.length) {
+    list.replaceChildren(createCell('empty', 'No commits match the filters.'));
+    return;
+  }
   const lanes = laneCount();
   list.replaceChildren(drawGraph(lanes));
   for (let i = 0; i < rows.length; i++) list.append(createRow(rows[i], i, lanes));
+  if (hasMore) list.append(createLoadMore());
 }

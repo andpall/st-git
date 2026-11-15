@@ -3,6 +3,7 @@ import { promisify } from 'util';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
+import { askpassEnvironment } from './askpass';
 
 export type Operation = 'rebase' | 'merge' | 'cherry-pick' | 'revert';
 
@@ -20,7 +21,7 @@ const OPERATION_MARKERS: { marker: string; operation: Operation }[] = [
 
 export async function git(cwd: string, args: string[], env?: NodeJS.ProcessEnv): Promise<string> {
   try {
-    const options = { cwd, env: { ...process.env, ...NO_TERMINAL_PROMPTS, ...env }, maxBuffer: MAX_OUTPUT_BYTES };
+    const options = { cwd, env: { ...process.env, ...NO_TERMINAL_PROMPTS, ...askpassEnvironment(), ...env }, maxBuffer: MAX_OUTPUT_BYTES };
     const { stdout } = await execFileAsync('git', args, options);
     return stdout;
   } catch (error) {
@@ -36,8 +37,10 @@ export function isMissingCommitError(error: unknown) {
 export async function repoRoot() {
   const folder = vscode.workspace.workspaceFolders?.[0];
   if (!folder) throw new Error('Open a folder with a git repository.');
-  const root = await git(folder.uri.fsPath, ['rev-parse', '--show-toplevel']);
-  return root.trim();
+  const output = await git(folder.uri.fsPath, ['rev-parse', '--show-toplevel']);
+  const root = output.trim();
+  const sameDirectory = fs.realpathSync(folder.uri.fsPath) === fs.realpathSync(root);
+  return sameDirectory ? folder.uri.fsPath : root;
 }
 
 export async function repoGit(args: string[], env?: NodeJS.ProcessEnv) {

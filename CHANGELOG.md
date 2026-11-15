@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.1.0
+
+- Log: search by text or hash, filters by branch, user and date, "Load more commits"
+- Annotate with Git Blame in the editor and line numbers context menu, hover with "Show in Log"
+- Show Git History for a file (explorer, editor and tab context menus)
+- Git asks for username, password or SSH passphrase in VS Code instead of failing (macOS, Linux)
+- Branch name check catches conflicts like "feature" vs "feature/x"
+- Merge editor opens correctly when the project path goes through a symlink
+- Status bar shows a running rebase, merge, cherry-pick or revert
+- Larger Log panel by default
+
 ## 0.0.1
 
 - First release: commit graph, local changes and commit, branches, stashes, rebase and conflict resolution, history editing (undo, squash, drop, reword, cherry-pick, revert)

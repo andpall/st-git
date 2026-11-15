@@ -2,7 +2,7 @@
   "name": "st-git",
   "displayName": "st-git",
   "description": "Full git client in the sidebar: commit graph, local changes, branches, stashes, squash, rebase and conflict resolution",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "publisher": "andpall",
   "license": "MIT",
   "icon": "resources/icon.png",
@@ -43,30 +43,36 @@
       "stGit": [
         {
           "id": "st-git.localChanges",
-          "name": "Local Changes"
+          "name": "Local Changes",
+          "initialSize": 2
         },
         {
           "type": "webview",
           "id": "st-git.commit",
-          "name": "Commit"
+          "name": "Commit",
+          "initialSize": 1.4
         },
         {
           "type": "webview",
           "id": "st-git.graph",
-          "name": "Log"
+          "name": "Log",
+          "initialSize": 6
         },
         {
           "id": "st-git.changes",
-          "name": "Changes"
+          "name": "Changes",
+          "initialSize": 2
         },
         {
           "id": "st-git.conflicts",
           "name": "Conflicts",
-          "when": "st-git.operation || st-git.hasConflicts"
+          "when": "st-git.operation || st-git.hasConflicts",
+          "initialSize": 2
         },
         {
           "id": "st-git.stashes",
-          "name": "Stashes"
+          "name": "Stashes",
+          "initialSize": 1
         }
       ]
     },
@@ -230,6 +236,22 @@
       {
         "command": "st-git.compareWithCurrent",
         "title": "Compare with Current Branch",
+        "category": "st-git"
+      },
+      {
+        "command": "st-git.toggleBlame",
+        "title": "Annotate with Git Blame",
+        "category": "st-git"
+      },
+      {
+        "command": "st-git.showFileHistory",
+        "title": "Show Git History",
+        "category": "st-git",
+        "icon": "$(history)"
+      },
+      {
+        "command": "st-git.revealCommit",
+        "title": "Show Commit in Log",
         "category": "st-git"
       }
     ],
@@ -438,6 +460,10 @@
         {
           "command": "st-git.rollback",
           "when": "false"
+        },
+        {
+          "command": "st-git.revealCommit",
+          "when": "false"
         }
       ],
       "view/item/context": [
@@ -511,6 +537,39 @@
           "when": "view == st-git.stashes && viewItem == stash",
           "group": "1_stash@2"
         }
+      ],
+      "editor/context": [
+        {
+          "command": "st-git.toggleBlame",
+          "when": "resourceScheme == file",
+          "group": "st-git@1"
+        },
+        {
+          "command": "st-git.showFileHistory",
+          "when": "resourceScheme == file",
+          "group": "st-git@2"
+        }
+      ],
+      "editor/lineNumber/context": [
+        {
+          "command": "st-git.toggleBlame",
+          "when": "resourceScheme == file",
+          "group": "st-git@1"
+        }
+      ],
+      "editor/title/context": [
+        {
+          "command": "st-git.showFileHistory",
+          "when": "resourceScheme == file",
+          "group": "st-git@1"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "st-git.showFileHistory",
+          "when": "!explorerResourceIsFolder",
+          "group": "st-git@1"
+        }
       ]
     }
   },
@@ -519,7 +578,8 @@
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "test": "npm run compile && node --test \"out/**/*.test.js\"",
-    "playground:reset": "bash scripts/playground.sh --reset"
+    "playground:reset": "bash scripts/playground.sh --reset",
+    "package": "npx @vscode/vsce package"
   },
   "devDependencies": {
     "@types/node": "^26.6.6",

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -e
-DIR="$(cd "$(dirname "$0")/.." && pwd)/.playground"
+DIR="${PLAYGROUND_DIR:-$(cd "$(dirname "$0")/.." && pwd)/.playground}"
 [ "$1" = "--reset" ] && rm -rf "$DIR"
 [ -d "$DIR/.git" ] && exit 0
 

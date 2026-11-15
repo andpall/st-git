@@ -2,15 +2,25 @@ import * as vscode from 'vscode';
 import { repoRoot } from '../../api/git';
 import { updateOperationState } from '../../ui/operationState';
 import { layout } from './graph';
-import { readLog } from './readLog';
+import { EMPTY_FILTERS, isFiltered, readBranchNames, readLog, type LogFilters } from './readLog';
 import { readCommitDetails } from './details';
+import { renderLogHtml } from './logHtml';
 
 export type CommitContext = { hash: string };
-type WebviewMessage = { type: 'ready' } | { type: 'select'; hashes: string[] };
+type WebviewMessage =
+  | { type: 'ready' }
+  | { type: 'more' }
+  | { type: 'select'; hashes: string[] }
+  | { type: 'filter'; filters: LogFilters }
+  | { type: 'revealMissing'; hash: string };
+
+const PAGE_SIZE = 500;
 
 let view: vscode.WebviewView | undefined;
 let webviewRoot: vscode.Uri;
 let selection: string[] = [];
+let filters: LogFilters = EMPTY_FILTERS;
+let limit = PAGE_SIZE;
 let onSelectionChange: (hashes: string[]) => Promise<void>;
 
 export function getSelection() {
@@ -26,41 +36,9 @@ export function registerGitLog(context: vscode.ExtensionContext, selectionListen
 function resolveWebviewView(webviewView: vscode.WebviewView) {
   view = webviewView;
   webviewView.webview.options = { enableScripts: true, localResourceRoots: [webviewRoot] };
-  webviewView.webview.html = renderHtml(webviewView.webview);
+  webviewView.webview.html = renderLogHtml(webviewView.webview, webviewRoot);
   webviewView.webview.onDidReceiveMessage(handleMessage);
   webviewView.onDidChangeVisibility(handleVisibilityChange);
-}
-
-function assetUri(webview: vscode.Webview, file: string) {
-  const fileUri = vscode.Uri.joinPath(webviewRoot, file);
-  return webview.asWebviewUri(fileUri);
-}
-
-const SCRIPTS = ['state.js', 'graph.js', 'rows.js', 'details.js', 'selection.js', 'main.js'];
-
-function scriptTags(webview: vscode.Webview) {
-  const tags: string[] = [];
-  for (const file of SCRIPTS) tags.push(`<script src="${assetUri(webview, file)}"></script>`);
-  return tags.join('\n');
-}
-
-function renderHtml(webview: vscode.Webview) {
-  const source = webview.cspSource;
-  return `<!DOCTYPE html><html><head><meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${source}; script-src ${source};">
-<link rel="stylesheet" href="${assetUri(webview, 'log.css')}"></head>
-<body><div id="list"></div><div id="details" hidden></div>
-${scriptTags(webview)}</body></html>`;
-}
-
-async function handleMessage(message: WebviewMessage) {
-  if (message.type === 'select') {
-    selection = message.hashes;
-    await onSelectionChange(selection);
-    await postDetails();
-    return;
-  }
-  await refreshGitLog();
 }
 
 async function postDetails() {
@@ -75,8 +53,46 @@ async function postDetails() {
   }
 }
 
+async function applyFilters(next: LogFilters) {
+  filters = next;
+  limit = PAGE_SIZE;
+  await refreshGitLog();
+}
+
+async function handleMessage(message: WebviewMessage) {
+  switch (message.type) {
+    case 'select':
+      selection = message.hashes;
+      await onSelectionChange(selection);
+      await postDetails();
+      return;
+    case 'filter':
+      await applyFilters(message.filters);
+      return;
+    case 'more':
+      limit += PAGE_SIZE;
+      await refreshGitLog();
+      return;
+    case 'revealMissing':
+      await applyFilters({ ...EMPTY_FILTERS, text: message.hash });
+      return;
+    case 'ready':
+      await refreshGitLog();
+  }
+}
+
 async function handleVisibilityChange() {
   if (view?.visible) await refreshGitLog();
+}
+
+export async function showPathHistory(relativePath: string) {
+  await vscode.commands.executeCommand('st-git.graph.focus');
+  await applyFilters({ ...EMPTY_FILTERS, path: relativePath });
+}
+
+export async function revealCommit(hash: string) {
+  await vscode.commands.executeCommand('st-git.graph.focus');
+  await view?.webview.postMessage({ type: 'reveal', hash });
 }
 
 export async function refreshGitLog() {
@@ -84,8 +100,10 @@ export async function refreshGitLog() {
   if (!view) return;
   try {
     const root = await repoRoot();
-    const commits = await readLog(root);
-    await view.webview.postMessage({ type: 'rows', rows: layout(commits) });
+    const commits = await readLog(root, filters, limit);
+    const branches = await readBranchNames(root);
+    const hasMore = commits.length === limit;
+    await view.webview.postMessage({ type: 'rows', rows: layout(commits), filtered: isFiltered(filters), hasMore, branches, filters });
   } catch (error) {
     await view.webview.postMessage({ type: 'error', text: (error as Error).message });
   }

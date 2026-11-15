@@ -51,3 +51,14 @@ function handleContextMenu(event) {
   const index = rowIndexAt(event);
   if (index >= 0 && !isSelected(rows[index])) select(index, {});
 }
+
+function revealRow(hash) {
+  for (let i = 0; i < rows.length; i++) {
+    if (!rows[i].hash.startsWith(hash)) continue;
+    select(i, {});
+    const element = list.querySelector(`.row[data-i="${i}"]`);
+    element.scrollIntoView({ block: 'center' });
+    return true;
+  }
+  return false;
+}

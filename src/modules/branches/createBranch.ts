@@ -1,6 +1,13 @@
 import * as vscode from 'vscode';
 import { repoGit } from '../../api/git';
 import { checkout } from './checkout';
+import { branchNameConflict } from './branchNameConflict';
+
+async function localBranchNames() {
+  const output = await repoGit(['for-each-ref', '--format=%(refname:short)', 'refs/heads']);
+  const lines = output.split('\n');
+  return lines.filter(Boolean);
+}
 
 export async function validateBranchName(name: string) {
   if (!name.trim()) return 'Enter a branch name.';
@@ -9,12 +16,7 @@ export async function validateBranchName(name: string) {
   } catch {
     return 'This is not a valid branch name.';
   }
-  try {
-    await repoGit(['rev-parse', '--verify', '--quiet', `refs/heads/${name}`]);
-    return 'A branch with this name already exists.';
-  } catch {
-    return undefined;
-  }
+  return branchNameConflict(name, await localBranchNames());
 }
 
 export async function createBranch(startPoint: string, startLabel: string) {

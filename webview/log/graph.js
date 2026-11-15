@@ -29,6 +29,7 @@ function edgePath(fromRow, fromCol, lane, toRow, toCol) {
 }
 
 function laneCount() {
+  if (graphFiltered) return 1;
   let maxLane = 0;
   for (const row of rows) {
     maxLane = Math.max(maxLane, row.col);
@@ -47,9 +48,12 @@ function drawEdges(graph, row, index) {
 
 function drawGraph(lanes) {
   const graph = createSvg('svg', { width: lanes * LANE_WIDTH, height: rows.length * ROW_HEIGHT, class: 'graph' });
-  for (let i = 0; i < rows.length; i++) drawEdges(graph, rows[i], i);
+  if (!graphFiltered) {
+    for (let i = 0; i < rows.length; i++) drawEdges(graph, rows[i], i);
+  }
   for (let i = 0; i < rows.length; i++) {
-    const dot = { cx: laneX(rows[i].col), cy: rowY(i), r: 4, fill: laneColor(rows[i].col) };
+    const col = colOf(rows[i]);
+    const dot = { cx: laneX(col), cy: rowY(i), r: 4, fill: laneColor(col) };
     graph.append(createSvg('circle', dot));
   }
   return graph;

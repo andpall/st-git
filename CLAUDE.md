@@ -44,15 +44,17 @@ const commits = nonEmpty.map(parseCommitLine);
 src/
   extension.ts   точка входа, регистрация команд
   guarded.ts     обёртка команд: ловит ошибку, обновляет панели, показывает конфликты
+  askpassMain.ts скрипт, который git вызывает вместо терминала, чтобы спросить логин/пароль
   refresh.ts     обновление всех панелей и слежение за .git и файлами
-  api/           общий доступ к git CLI и содержимому версий файлов (gitContent)
+  api/           общий доступ к git CLI, содержимому версий файлов (gitContent) и ввод логина/пароля для git (askpass)
   ui/            общие диалоги VS Code
   commands/      команды над историей: по файлу на команду
   utils/         общие чистые функции без vscode и git: парсеры вывода git, дерево файлов
   modules/       фичи: всё по фиче в одной папке (UI, чтение из git, чистые функции, tests/)
     branches/    окно веток: checkout, новая ветка, Smart Checkout, ветка в статус-баре
     commit/      Local Changes (файлы с галочками) и Commit (сообщение, Amend, кнопка Commit)
-    log/         панель Log: provider, readLog, graph
+    log/         панель Log: provider, readLog (фильтры, подгрузка), graph, история файла
+    blame/       Annotate with Git Blame в редакторе
     changes/     панель Changes: дерево файлов коммита, diff
     conflicts/   панель Conflicts: конфликты при rebase/merge/cherry-pick/revert/stash, accept/merge
     stash/       панель Stashes: список, файлы, apply/pop/drop

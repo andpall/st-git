@@ -1,9 +1,12 @@
 import * as vscode from 'vscode';
 import { registerGitContent } from './api/gitContent';
+import { startAskpass } from './api/askpass';
 import { setDialogAssets } from './ui/messageDialog';
 import { guarded } from './guarded';
 import { refreshAll, watchRepository } from './refresh';
-import { registerGitLog, getSelection } from './modules/log/provider';
+import { registerGitLog, getSelection, revealCommit } from './modules/log/provider';
+import { showFileHistory } from './modules/log/fileHistory';
+import { registerBlame, toggleBlame } from './modules/blame/blame';
 import { registerChanges, showCommitChanges, showComparison } from './modules/changes/provider';
 import { openDiff } from './modules/changes/openDiff';
 import { registerConflicts } from './modules/conflicts/provider';
@@ -56,16 +59,21 @@ const GUARDED_COMMANDS: Record<string, (...args: never[]) => Promise<unknown>> =
   'st-git.push': push,
   'st-git.pull': pull,
   'st-git.fetch': fetchAll,
+  'st-git.toggleBlame': toggleBlame,
+  'st-git.showFileHistory': showFileHistory,
+  'st-git.revealCommit': revealCommit,
 };
 
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
   setDialogAssets(context.extensionUri);
+  context.subscriptions.push(await startAskpass(context.globalStorageUri.fsPath));
   context.subscriptions.push(
     registerGitContent(),
     registerChanges(),
     registerConflicts(),
     registerLocalChanges(),
     registerStashes(),
+    registerBlame(),
     registerBranchStatus(),
     registerCommitPanel(context, guarded(commitChecked)),
     registerGitLog(context, showCommitChanges),

@@ -41,4 +41,10 @@ Squash, rebase, undo, drop and message edits rewrite history. st-git asks for co
 
 ## Support
 
-st-git is free. If it saves you time, you can [support its development](https://boosty.to/andpall) ❤
+st-git is free. If it saves you time, you can support its development ❤
+
+- [Boosty](https://boosty.to/andpall)
+- USDT / TRX (Tron, TRC-20): `TZHyouur3JoN3GAtVWHPvyaiH19pVsmeM5`
+- USDT / BNB (BNB Smart Chain, BEP-20): `0xBf6Bd16cDD0bD4bC65455c9128c2dd003F889d7a`
+
+Please double-check the network before sending: funds sent over a different network may be lost.

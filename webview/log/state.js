@@ -8,6 +8,8 @@ const detailsPanel = document.getElementById('details');
 let rows = [];
 let selected = new Set();
 let anchor = -1;
+let graphFiltered = false;
+let hasMore = false;
 
 function hashOf(row) {
   return row.hash;
@@ -15,4 +17,8 @@ function hashOf(row) {
 
 function isSelected(row) {
   return selected.has(row.hash);
+}
+
+function colOf(row) {
+  return graphFiltered ? 0 : row.col;
 }
