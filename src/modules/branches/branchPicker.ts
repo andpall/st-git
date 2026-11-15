@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 import { repoGit } from '../../api/git';
 import { BRANCH_FORMAT, parseBranches, type Branch } from './parseBranches';
-import { checkout, checkoutRemote } from './checkout';
 import { createBranch } from './createBranch';
+import { showBranchActions } from './branchActions';
 
 type BranchItem = vscode.QuickPickItem & { branch?: Branch; createNew?: boolean };
 
@@ -33,6 +33,10 @@ function isRemote(branch: Branch) {
   return branch.remote;
 }
 
+function isCurrent(branch: Branch) {
+  return branch.current;
+}
+
 function nameOf(branch: Branch) {
   return branch.name;
 }
@@ -43,13 +47,13 @@ export async function showBranches() {
   const remote = branches.filter(isRemote);
   const items: BranchItem[] = [{ label: '$(add) New Branch...', createNew: true }, separator('Local Branches'), ...local.map(branchItem)];
   if (remote.length) items.push(separator('Remote Branches'), ...remote.map(branchItem));
-  const picked = await vscode.window.showQuickPick(items, { title: 'Branches', placeHolder: 'Checkout a branch or create a new one', matchOnDescription: true });
+  const picked = await vscode.window.showQuickPick(items, { title: 'Branches', placeHolder: 'Pick a branch to see its actions, or create a new one', matchOnDescription: true });
   if (!picked) return;
   if (picked.createNew) {
     await createBranch('HEAD', 'the current branch');
     return;
   }
-  if (!picked.branch || picked.branch.current) return;
-  if (picked.branch.remote) await checkoutRemote(picked.branch.name, new Set(local.map(nameOf)));
-  else await checkout([picked.branch.name]);
+  if (!picked.branch) return;
+  const current = branches.find(isCurrent);
+  await showBranchActions(picked.branch, current?.name ?? 'HEAD', new Set(local.map(nameOf)));
 }

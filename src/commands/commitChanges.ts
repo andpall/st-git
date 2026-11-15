@@ -1,4 +1,4 @@
-import { repoGit } from '../api/git';
+import { currentOperation, repoGit } from '../api/git';
 import { confirmIfPushed } from '../ui/confirm';
 import type { Change } from '../utils/nameStatus';
 
@@ -10,7 +10,13 @@ function isUnversioned(change: Change) {
   return change.status === '?';
 }
 
+async function commitMerge(message: string) {
+  await repoGit(message.trim() ? ['commit', '-m', message] : ['commit', '--no-edit']);
+  return true;
+}
+
 export async function commitChanges(message: string, amend: boolean, changes: Change[]) {
+  if (await currentOperation() === 'merge') return commitMerge(message);
   if (!message.trim()) throw new Error('Enter a commit message.');
   if (!amend && !changes.length) throw new Error('Select files to commit in Local Changes.');
   if (amend && !(await confirmIfPushed('Amend last commit?', 'HEAD'))) return false;

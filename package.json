@@ -43,7 +43,11 @@
         {
           "id": "st-git.conflicts",
           "name": "Conflicts",
-          "when": "st-git.rebasing || st-git.hasConflicts"
+          "when": "st-git.operation || st-git.hasConflicts"
+        },
+        {
+          "id": "st-git.stashes",
+          "name": "Stashes"
         }
       ]
     },
@@ -68,18 +72,6 @@
         "command": "st-git.rebaseOnto",
         "title": "Rebase Current Branch onto This",
         "category": "st-git"
-      },
-      {
-        "command": "st-git.rebaseContinue",
-        "title": "Continue Rebase",
-        "category": "st-git",
-        "icon": "$(debug-continue)"
-      },
-      {
-        "command": "st-git.rebaseAbort",
-        "title": "Abort Rebase",
-        "category": "st-git",
-        "icon": "$(discard)"
       },
       {
         "command": "st-git.openDiff",
@@ -130,53 +122,163 @@
         "command": "st-git.newBranch",
         "title": "New Branch...",
         "category": "st-git"
+      },
+      {
+        "command": "st-git.continueOperation",
+        "title": "Continue",
+        "category": "st-git",
+        "icon": "$(debug-continue)"
+      },
+      {
+        "command": "st-git.abortOperation",
+        "title": "Abort",
+        "category": "st-git",
+        "icon": "$(discard)"
+      },
+      {
+        "command": "st-git.push",
+        "title": "Push...",
+        "category": "st-git",
+        "icon": "$(arrow-up)"
+      },
+      {
+        "command": "st-git.pull",
+        "title": "Pull...",
+        "category": "st-git",
+        "icon": "$(arrow-down)"
+      },
+      {
+        "command": "st-git.fetch",
+        "title": "Fetch",
+        "category": "st-git",
+        "icon": "$(sync)"
+      },
+      {
+        "command": "st-git.rollback",
+        "title": "Rollback...",
+        "category": "st-git",
+        "icon": "$(discard)"
+      },
+      {
+        "command": "st-git.stashChanges",
+        "title": "Stash Changes...",
+        "category": "st-git",
+        "icon": "$(archive)"
+      },
+      {
+        "command": "st-git.applyStash",
+        "title": "Apply Stash",
+        "category": "st-git",
+        "icon": "$(check)"
+      },
+      {
+        "command": "st-git.popStash",
+        "title": "Pop Stash",
+        "category": "st-git",
+        "icon": "$(export)"
+      },
+      {
+        "command": "st-git.dropStash",
+        "title": "Drop Stash",
+        "category": "st-git",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "st-git.rewordCommit",
+        "title": "Edit Commit Message...",
+        "category": "st-git"
+      },
+      {
+        "command": "st-git.dropCommit",
+        "title": "Drop Commit",
+        "category": "st-git"
+      },
+      {
+        "command": "st-git.cherryPick",
+        "title": "Cherry-Pick",
+        "category": "st-git"
+      },
+      {
+        "command": "st-git.revertCommit",
+        "title": "Revert Commit",
+        "category": "st-git"
+      },
+      {
+        "command": "st-git.resetToHere",
+        "title": "Reset Current Branch to Here...",
+        "category": "st-git"
+      },
+      {
+        "command": "st-git.compareWithCurrent",
+        "title": "Compare with Current Branch",
+        "category": "st-git"
       }
     ],
     "menus": {
       "view/title": [
         {
-          "command": "st-git.rebaseContinue",
-          "when": "view == st-git.graph && st-git.rebasing",
+          "command": "st-git.continueOperation",
+          "when": "(view == st-git.graph || view == st-git.conflicts) && st-git.operation",
+          "group": "navigation@0"
+        },
+        {
+          "command": "st-git.abortOperation",
+          "when": "(view == st-git.graph || view == st-git.conflicts) && st-git.operation",
           "group": "navigation@1"
         },
         {
-          "command": "st-git.rebaseAbort",
-          "when": "view == st-git.graph && st-git.rebasing",
+          "command": "st-git.branches",
+          "when": "view == st-git.graph",
           "group": "navigation@2"
         },
         {
-          "command": "st-git.amendCommit",
-          "when": "view == st-git.graph && !st-git.rebasing",
+          "command": "st-git.pull",
+          "when": "view == st-git.graph",
           "group": "navigation@3"
         },
         {
-          "command": "st-git.refresh",
+          "command": "st-git.push",
           "when": "view == st-git.graph",
           "group": "navigation@4"
         },
         {
-          "command": "st-git.rebaseContinue",
-          "when": "view == st-git.conflicts && st-git.rebasing",
+          "command": "st-git.fetch",
+          "when": "view == st-git.graph",
+          "group": "navigation@5"
+        },
+        {
+          "command": "st-git.amendCommit",
+          "when": "view == st-git.graph && !st-git.operation",
+          "group": "1_more@1"
+        },
+        {
+          "command": "st-git.refresh",
+          "when": "view == st-git.graph",
+          "group": "1_more@2"
+        },
+        {
+          "command": "st-git.branches",
+          "when": "view == st-git.localChanges",
+          "group": "navigation@0"
+        },
+        {
+          "command": "st-git.rollback",
+          "when": "view == st-git.localChanges",
           "group": "navigation@1"
         },
         {
-          "command": "st-git.rebaseAbort",
-          "when": "view == st-git.conflicts && st-git.rebasing",
+          "command": "st-git.stashChanges",
+          "when": "view == st-git.localChanges",
           "group": "navigation@2"
         },
         {
           "command": "st-git.refresh",
           "when": "view == st-git.localChanges",
-          "group": "navigation"
+          "group": "navigation@3"
         },
         {
-          "command": "st-git.branches",
-          "when": "view == st-git.graph",
-          "group": "navigation@0"
-        },
-        {
-          "command": "st-git.branches",
-          "when": "view == st-git.localChanges",
+          "command": "st-git.stashChanges",
+          "when": "view == st-git.stashes",
           "group": "navigation@0"
         }
       ],
@@ -194,25 +296,58 @@
         {
           "command": "st-git.amendCommit",
           "when": "webviewId == st-git.graph && webviewSection == commit",
-          "group": "1_git@0"
+          "group": "1_edit@2"
+        },
+        {
+          "command": "st-git.rewordCommit",
+          "when": "webviewId == st-git.graph && webviewSection == commit",
+          "group": "1_edit@3"
         },
         {
           "command": "st-git.undoCommit",
           "when": "webviewId == st-git.graph && webviewSection == commit",
-          "group": "1_git@1"
+          "group": "1_edit@4"
         },
         {
           "command": "st-git.squash",
           "when": "webviewId == st-git.graph && webviewSection == commit",
-          "group": "1_git@2"
+          "group": "1_edit@5"
+        },
+        {
+          "command": "st-git.dropCommit",
+          "when": "webviewId == st-git.graph && webviewSection == commit",
+          "group": "1_edit@6"
+        },
+        {
+          "command": "st-git.cherryPick",
+          "when": "webviewId == st-git.graph && webviewSection == commit",
+          "group": "2_apply@7"
+        },
+        {
+          "command": "st-git.revertCommit",
+          "when": "webviewId == st-git.graph && webviewSection == commit",
+          "group": "2_apply@8"
         },
         {
           "command": "st-git.rebaseOnto",
           "when": "webviewId == st-git.graph && webviewSection == commit",
-          "group": "1_git@3"
+          "group": "3_branch@9"
+        },
+        {
+          "command": "st-git.resetToHere",
+          "when": "webviewId == st-git.graph && webviewSection == commit",
+          "group": "3_branch@10"
         }
       ],
       "commandPalette": [
+        {
+          "command": "st-git.checkoutCommit",
+          "when": "false"
+        },
+        {
+          "command": "st-git.newBranch",
+          "when": "false"
+        },
         {
           "command": "st-git.undoCommit",
           "when": "false"
@@ -230,6 +365,10 @@
           "when": "false"
         },
         {
+          "command": "st-git.openLocalDiff",
+          "when": "false"
+        },
+        {
           "command": "st-git.acceptCurrent",
           "when": "false"
         },
@@ -242,15 +381,43 @@
           "when": "false"
         },
         {
-          "command": "st-git.openLocalDiff",
+          "command": "st-git.rewordCommit",
           "when": "false"
         },
         {
-          "command": "st-git.checkoutCommit",
+          "command": "st-git.dropCommit",
           "when": "false"
         },
         {
-          "command": "st-git.newBranch",
+          "command": "st-git.cherryPick",
+          "when": "false"
+        },
+        {
+          "command": "st-git.revertCommit",
+          "when": "false"
+        },
+        {
+          "command": "st-git.resetToHere",
+          "when": "false"
+        },
+        {
+          "command": "st-git.compareWithCurrent",
+          "when": "false"
+        },
+        {
+          "command": "st-git.applyStash",
+          "when": "false"
+        },
+        {
+          "command": "st-git.popStash",
+          "when": "false"
+        },
+        {
+          "command": "st-git.dropStash",
+          "when": "false"
+        },
+        {
+          "command": "st-git.rollback",
           "when": "false"
         }
       ],
@@ -284,6 +451,46 @@
           "command": "st-git.openMerge",
           "when": "view == st-git.conflicts && viewItem == conflict",
           "group": "1_resolve@3"
+        },
+        {
+          "command": "st-git.rollback",
+          "when": "view == st-git.localChanges && viewItem == localChange",
+          "group": "inline"
+        },
+        {
+          "command": "st-git.rollback",
+          "when": "view == st-git.localChanges && viewItem == localChange",
+          "group": "1_change"
+        },
+        {
+          "command": "st-git.applyStash",
+          "when": "view == st-git.stashes && viewItem == stash",
+          "group": "inline@0"
+        },
+        {
+          "command": "st-git.applyStash",
+          "when": "view == st-git.stashes && viewItem == stash",
+          "group": "1_stash@0"
+        },
+        {
+          "command": "st-git.popStash",
+          "when": "view == st-git.stashes && viewItem == stash",
+          "group": "inline@1"
+        },
+        {
+          "command": "st-git.popStash",
+          "when": "view == st-git.stashes && viewItem == stash",
+          "group": "1_stash@1"
+        },
+        {
+          "command": "st-git.dropStash",
+          "when": "view == st-git.stashes && viewItem == stash",
+          "group": "inline@2"
+        },
+        {
+          "command": "st-git.dropStash",
+          "when": "view == st-git.stashes && viewItem == stash",
+          "group": "1_stash@2"
         }
       ]
     }

@@ -8,9 +8,14 @@ async function firstParent(hash: string) {
   return ids[1];
 }
 
+export async function readRangeChanges(before: string, after: string): Promise<Change[]> {
+  const output = await repoGit(['diff-tree', '-r', '-z', '-M', '--name-status', before, after]);
+  return parseNameStatus(output);
+}
+
 export async function readChanges(hash: string): Promise<Change[]> {
   const parent = await firstParent(hash);
-  const range = parent ? [parent, hash] : ['--root', '--no-commit-id', hash];
-  const output = await repoGit(['diff-tree', '-r', '-z', '-M', '--name-status', ...range]);
+  if (parent) return readRangeChanges(parent, hash);
+  const output = await repoGit(['diff-tree', '-r', '-z', '-M', '--name-status', '--root', '--no-commit-id', hash]);
   return parseNameStatus(output);
 }

@@ -1,28 +1,62 @@
 import * as vscode from 'vscode';
-import { isMissingCommitError, isRebasing } from './api/git';
-import { registerGitLog, refreshGitLog, getSelection } from './modules/log/provider';
-import { registerChanges, showCommitChanges } from './modules/changes/provider';
 import { registerGitContent } from './api/gitContent';
-import { openDiff } from './modules/changes/openDiff';
-import { registerConflicts, refreshConflicts, focusConflicts } from './modules/conflicts/provider';
-import { acceptCurrent, acceptIncoming, openMerge } from './modules/conflicts/resolve';
 import { setDialogAssets } from './ui/messageDialog';
-import { registerLocalChanges, refreshLocalChanges, checkedChanges } from './modules/commit/localChanges';
+import { guarded } from './guarded';
+import { refreshAll, watchRepository } from './refresh';
+import { registerGitLog, getSelection } from './modules/log/provider';
+import { registerChanges, showCommitChanges, showComparison } from './modules/changes/provider';
+import { openDiff } from './modules/changes/openDiff';
+import { registerConflicts } from './modules/conflicts/provider';
+import { acceptCurrent, acceptIncoming, openMerge } from './modules/conflicts/resolve';
+import { registerLocalChanges, checkedChanges } from './modules/commit/localChanges';
 import { registerCommitPanel } from './modules/commit/commitPanel';
 import { openLocalDiff } from './modules/commit/openLocalDiff';
-import { commitChanges } from './commands/commitChanges';
-import { registerBranchStatus, refreshBranchStatus } from './modules/branches/statusBar';
+import { rollback } from './modules/commit/rollback';
+import { registerBranchStatus } from './modules/branches/statusBar';
 import { showBranches } from './modules/branches/branchPicker';
 import { checkoutCommit, newBranchFromCommit } from './modules/branches/commitActions';
+import { registerStashes } from './modules/stash/provider';
+import { applyStash, dropStash, popStash, stashChanges } from './modules/stash/actions';
+import { commitChanges } from './commands/commitChanges';
 import { undoCommit } from './commands/undoCommit';
 import { amendCommit } from './commands/amendCommit';
+import { rewordCommit } from './commands/reword';
 import { squash } from './commands/squash';
-import { rebaseOnto, rebaseContinue, rebaseAbort } from './commands/rebase';
+import { dropCommit } from './commands/dropCommit';
+import { cherryPick, revertCommit } from './commands/cherryPick';
+import { resetToHere } from './commands/resetToHere';
+import { rebaseOnto } from './commands/rebase';
+import { continueOperation, abortOperation } from './commands/operation';
+import { push } from './commands/push';
+import { pull, fetchAll } from './commands/pull';
 
-const ABORT_REBASE = 'Abort Rebase';
-const REBASE_CONFLICT = 'Rebase stopped on conflicts. Resolve them in the Conflicts panel, then press Continue Rebase.';
-const STALE_LOG = 'That commit no longer exists: the log was out of date and has been refreshed. Try again.';
-const REFRESH_DELAY_MS = 300;
+const GUARDED_COMMANDS: Record<string, (...args: never[]) => Promise<unknown>> = {
+  'st-git.acceptCurrent': acceptCurrent,
+  'st-git.acceptIncoming': acceptIncoming,
+  'st-git.branches': showBranches,
+  'st-git.checkoutCommit': checkoutCommit,
+  'st-git.newBranch': newBranchFromCommit,
+  'st-git.compareWithCurrent': showComparison,
+  'st-git.rollback': rollback,
+  'st-git.stashChanges': stashChanges,
+  'st-git.applyStash': applyStash,
+  'st-git.popStash': popStash,
+  'st-git.dropStash': dropStash,
+  'st-git.undoCommit': undoCommit,
+  'st-git.amendCommit': amendCommit,
+  'st-git.rewordCommit': rewordCommit,
+  'st-git.squash': squashSelection,
+  'st-git.dropCommit': dropCommit,
+  'st-git.cherryPick': cherryPick,
+  'st-git.revertCommit': revertCommit,
+  'st-git.resetToHere': resetToHere,
+  'st-git.rebaseOnto': rebaseOnto,
+  'st-git.continueOperation': continueOperation,
+  'st-git.abortOperation': abortOperation,
+  'st-git.push': push,
+  'st-git.pull': pull,
+  'st-git.fetch': fetchAll,
+};
 
 export function activate(context: vscode.ExtensionContext) {
   setDialogAssets(context.extensionUri);
@@ -31,27 +65,19 @@ export function activate(context: vscode.ExtensionContext) {
     registerChanges(),
     registerConflicts(),
     registerLocalChanges(),
+    registerStashes(),
     registerBranchStatus(),
     registerCommitPanel(context, guarded(commitChecked)),
     registerGitLog(context, showCommitChanges),
-    watchGitState(),
-    watchWorkingTree(),
+    watchRepository(),
     vscode.commands.registerCommand('st-git.refresh', refreshAll),
     vscode.commands.registerCommand('st-git.openDiff', openDiff),
     vscode.commands.registerCommand('st-git.openLocalDiff', openLocalDiff),
     vscode.commands.registerCommand('st-git.openMerge', openMerge),
-    vscode.commands.registerCommand('st-git.branches', guarded(showBranches)),
-    vscode.commands.registerCommand('st-git.checkoutCommit', guarded(checkoutCommit)),
-    vscode.commands.registerCommand('st-git.newBranch', guarded(newBranchFromCommit)),
-    vscode.commands.registerCommand('st-git.acceptCurrent', guarded(acceptCurrent)),
-    vscode.commands.registerCommand('st-git.acceptIncoming', guarded(acceptIncoming)),
-    vscode.commands.registerCommand('st-git.undoCommit', guarded(undoCommit)),
-    vscode.commands.registerCommand('st-git.amendCommit', guarded(amendCommit)),
-    vscode.commands.registerCommand('st-git.squash', guarded(squashSelection)),
-    vscode.commands.registerCommand('st-git.rebaseOnto', guarded(rebaseOnto)),
-    vscode.commands.registerCommand('st-git.rebaseContinue', guarded(rebaseContinue)),
-    vscode.commands.registerCommand('st-git.rebaseAbort', guarded(rebaseAbort)),
   );
+  for (const [id, action] of Object.entries(GUARDED_COMMANDS)) {
+    context.subscriptions.push(vscode.commands.registerCommand(id, guarded(action)));
+  }
   refreshAll();
 }
 
@@ -64,68 +90,3 @@ function squashSelection() {
 function commitChecked(message: string, amend: boolean) {
   return commitChanges(message, amend, checkedChanges());
 }
-
-async function refreshAll() {
-  await refreshGitLog();
-  await refreshConflicts();
-  await refreshLocalChanges();
-  await refreshBranchStatus();
-}
-
-function debounced(task: () => Promise<void>) {
-  let timer: NodeJS.Timeout | undefined;
-  return function schedule() {
-    clearTimeout(timer);
-    timer = setTimeout(task, REFRESH_DELAY_MS);
-  };
-}
-
-const scheduleRefresh = debounced(refreshAll);
-const scheduleLocalRefresh = debounced(refreshLocalChanges);
-
-function watchWorkingTree() {
-  const watcher = vscode.workspace.createFileSystemWatcher('**/*');
-  watcher.onDidChange(scheduleLocalRefresh);
-  watcher.onDidCreate(scheduleLocalRefresh);
-  watcher.onDidDelete(scheduleLocalRefresh);
-  return watcher;
-}
-
-function watchGitState() {
-  const watcher = vscode.workspace.createFileSystemWatcher('**/.git/{index,HEAD}');
-  watcher.onDidChange(scheduleRefresh);
-  watcher.onDidCreate(scheduleRefresh);
-  watcher.onDidDelete(scheduleRefresh);
-  return watcher;
-}
-
-function guarded<Args extends unknown[]>(action: (...args: Args) => Promise<unknown>) {
-  return async function guardedAction(...args: Args) {
-    let failure: unknown;
-    let result: unknown;
-    try {
-      result = await action(...args);
-    } catch (error) {
-      failure = error;
-    }
-    await refreshAll();
-    if (failure) await reportError(failure);
-    return !failure && result !== false;
-  };
-}
-
-async function reportError(error: unknown) {
-  const rebasing = await isRebasing();
-  const conflictCount = await refreshConflicts();
-  if (rebasing || conflictCount) await focusConflicts();
-  const message = rebasing ? REBASE_CONFLICT : errorText(error);
-  const buttons = rebasing ? [ABORT_REBASE] : [];
-  const choice = await vscode.window.showErrorMessage(message, ...buttons);
-  if (choice === ABORT_REBASE) await guardedRebaseAbort();
-}
-
-function errorText(error: unknown) {
-  return isMissingCommitError(error) ? STALE_LOG : (error as Error).message;
-}
-
-const guardedRebaseAbort = guarded(rebaseAbort);

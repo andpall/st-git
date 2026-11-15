@@ -43,6 +43,8 @@ const commits = nonEmpty.map(parseCommitLine);
 ```
 src/
   extension.ts   точка входа, регистрация команд
+  guarded.ts     обёртка команд: ловит ошибку, обновляет панели, показывает конфликты
+  refresh.ts     обновление всех панелей и слежение за .git и файлами
   api/           общий доступ к git CLI и содержимому версий файлов (gitContent)
   ui/            общие диалоги VS Code
   commands/      команды над историей: по файлу на команду
@@ -52,8 +54,9 @@ src/
     commit/      Local Changes (файлы с галочками) и Commit (сообщение, Amend, кнопка Commit)
     log/         панель Log: provider, readLog, graph
     changes/     панель Changes: дерево файлов коммита, diff
-    conflicts/   панель Conflicts: список конфликтов при rebase, accept/merge
-webview/         JS/CSS для webview
+    conflicts/   панель Conflicts: конфликты при rebase/merge/cherry-pick/revert/stash, accept/merge
+    stash/       панель Stashes: список, файлы, apply/pop/drop
+webview/         JS/CSS для webview (log/ разбит на файлы, общие переменные в state.js)
 resources/       иконки
 scripts/         dev-скрипты (playground.sh создаёт тестовый репозиторий .playground)
 ```

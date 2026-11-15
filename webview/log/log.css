@@ -12,3 +12,9 @@ body { padding: 0; margin: 0; font-family: var(--vscode-font-family); font-size:
   background: var(--vscode-badge-background); color: var(--vscode-badge-foreground); }
 .ref.tag { background: var(--vscode-charts-yellow); color: #000; }
 @media (max-width: 520px) { .author, .date { display: none; } }
+html, body { height: 100%; }
+body { display: flex; flex-direction: column; }
+#list { flex: 1; overflow: auto; }
+#details { flex: 0 0 auto; max-height: 40%; overflow: auto; padding: 8px 10px; border-top: 1px solid var(--vscode-panel-border, var(--vscode-widget-border)); user-select: text; }
+#details .message { white-space: pre-wrap; margin-bottom: 6px; }
+#details .meta { opacity: .75; font-size: 12px; margin-top: 2px; }

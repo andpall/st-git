@@ -73,12 +73,14 @@ function getTreeItem(node: TreeNode) {
     item.resourceUri = workspaceUri(node.path);
     item.iconPath = vscode.ThemeIcon.Folder;
     item.checkboxState = hasCheckedFile(node) ? Checked : Unchecked;
+    item.contextValue = 'localChange';
     return item;
   }
   const item = new vscode.TreeItem(workspaceUri(node.path));
   item.iconPath = vscode.ThemeIcon.File;
   item.description = STATUS_LABELS[node.change.status] ?? node.change.status;
   item.checkboxState = isChecked(node.change) ? Checked : Unchecked;
+  item.contextValue = 'localChange';
   item.command = { command: 'st-git.openLocalDiff', title: 'Open Diff', arguments: [node.change, repoPath] };
   return item;
 }
@@ -87,9 +89,23 @@ export function checkedChanges() {
   return changes.filter(isChecked);
 }
 
+function changeOf(file: FileNode) {
+  return file.change;
+}
+
+export function changesFor(node?: TreeNode) {
+  if (!node) return checkedChanges();
+  const files = collectFiles(node, []);
+  return files.map(changeOf);
+}
+
 function updateDescription() {
   const checkedCount = checkedChanges().length;
   treeView.description = changes.length ? `${checkedCount} of ${changes.length} selected` : undefined;
+}
+
+export function currentRepoPath() {
+  return repoPath;
 }
 
 export async function refreshLocalChanges() {

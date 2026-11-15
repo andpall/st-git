@@ -1,10 +1,10 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import { repoGit, repoRoot } from '../../api/git';
-import { updateRebaseState } from '../../ui/rebaseState';
+import { updateOperationState } from '../../ui/operationState';
 import { parseConflicts, type Conflict } from './parseConflicts';
 
-const ALL_RESOLVED = 'All conflicts are resolved. Press Continue Rebase.';
+const ALL_RESOLVED = 'All conflicts are resolved. Press Continue.';
 const CONFLICT_LABELS: Record<string, string> = {
   UU: 'both modified', AA: 'both added', DD: 'both deleted',
   DU: 'deleted in current', UD: 'deleted in incoming', AU: 'added in current', UA: 'added in incoming',
@@ -41,13 +41,13 @@ async function readConflicts() {
 }
 
 export async function refreshConflicts() {
-  const rebasing = await updateRebaseState();
+  const operation = await updateOperationState();
   conflicts = [];
   treeView.message = undefined;
   try {
     repoPath = await repoRoot();
     conflicts = await readConflicts();
-    if (rebasing && !conflicts.length) treeView.message = ALL_RESOLVED;
+    if (operation && !conflicts.length) treeView.message = ALL_RESOLVED;
   } catch (error) {
     treeView.message = (error as Error).message;
   }

@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { repoGit } from '../../api/git';
 import { checkout } from './checkout';
 
-async function validateBranchName(name: string) {
+export async function validateBranchName(name: string) {
   if (!name.trim()) return 'Enter a branch name.';
   try {
     await repoGit(['check-ref-format', '--branch', name]);
