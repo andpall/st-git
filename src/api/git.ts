@@ -17,6 +17,12 @@ export async function git(cwd: string, args: string[], env?: NodeJS.ProcessEnv):
   }
 }
 
+const MISSING_COMMIT = /bad object|not a valid (object|commit)|unknown revision/i;
+
+export function isMissingCommitError(error: unknown) {
+  return MISSING_COMMIT.test((error as Error).message);
+}
+
 export async function repoRoot() {
   const folder = vscode.workspace.workspaceFolders?.[0];
   if (!folder) throw new Error('Open a folder with a git repository.');

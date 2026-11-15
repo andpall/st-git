@@ -12,16 +12,25 @@
   "main": "./out/extension.js",
   "contributes": {
     "viewsContainers": {
-      "panel": [
+      "activitybar": [
         {
           "id": "stGit",
-          "title": "Git Log",
+          "title": "st-git",
           "icon": "resources/icon.svg"
         }
       ]
     },
     "views": {
       "stGit": [
+        {
+          "id": "st-git.localChanges",
+          "name": "Local Changes"
+        },
+        {
+          "type": "webview",
+          "id": "st-git.commit",
+          "name": "Commit"
+        },
         {
           "type": "webview",
           "id": "st-git.graph",
@@ -30,6 +39,11 @@
         {
           "id": "st-git.changes",
           "name": "Changes"
+        },
+        {
+          "id": "st-git.conflicts",
+          "name": "Conflicts",
+          "when": "st-git.rebasing || st-git.hasConflicts"
         }
       ]
     },
@@ -58,42 +72,144 @@
       {
         "command": "st-git.rebaseContinue",
         "title": "Continue Rebase",
-        "category": "st-git"
+        "category": "st-git",
+        "icon": "$(debug-continue)"
       },
       {
         "command": "st-git.rebaseAbort",
         "title": "Abort Rebase",
-        "category": "st-git"
+        "category": "st-git",
+        "icon": "$(discard)"
       },
       {
         "command": "st-git.openDiff",
         "title": "Open Diff",
+        "category": "st-git"
+      },
+      {
+        "command": "st-git.acceptCurrent",
+        "title": "Accept Current (HEAD)",
+        "category": "st-git",
+        "icon": "$(arrow-left)"
+      },
+      {
+        "command": "st-git.acceptIncoming",
+        "title": "Accept Incoming (Commit)",
+        "category": "st-git",
+        "icon": "$(arrow-right)"
+      },
+      {
+        "command": "st-git.openMerge",
+        "title": "Merge...",
+        "category": "st-git",
+        "icon": "$(git-merge)"
+      },
+      {
+        "command": "st-git.amendCommit",
+        "title": "Amend Commit...",
+        "category": "st-git",
+        "icon": "$(edit)"
+      },
+      {
+        "command": "st-git.openLocalDiff",
+        "title": "Open Diff",
+        "category": "st-git"
+      },
+      {
+        "command": "st-git.branches",
+        "title": "Branches...",
+        "category": "st-git",
+        "icon": "$(git-branch)"
+      },
+      {
+        "command": "st-git.checkoutCommit",
+        "title": "Checkout...",
+        "category": "st-git"
+      },
+      {
+        "command": "st-git.newBranch",
+        "title": "New Branch...",
         "category": "st-git"
       }
     ],
     "menus": {
       "view/title": [
         {
+          "command": "st-git.rebaseContinue",
+          "when": "view == st-git.graph && st-git.rebasing",
+          "group": "navigation@1"
+        },
+        {
+          "command": "st-git.rebaseAbort",
+          "when": "view == st-git.graph && st-git.rebasing",
+          "group": "navigation@2"
+        },
+        {
+          "command": "st-git.amendCommit",
+          "when": "view == st-git.graph && !st-git.rebasing",
+          "group": "navigation@3"
+        },
+        {
           "command": "st-git.refresh",
           "when": "view == st-git.graph",
+          "group": "navigation@4"
+        },
+        {
+          "command": "st-git.rebaseContinue",
+          "when": "view == st-git.conflicts && st-git.rebasing",
+          "group": "navigation@1"
+        },
+        {
+          "command": "st-git.rebaseAbort",
+          "when": "view == st-git.conflicts && st-git.rebasing",
+          "group": "navigation@2"
+        },
+        {
+          "command": "st-git.refresh",
+          "when": "view == st-git.localChanges",
           "group": "navigation"
+        },
+        {
+          "command": "st-git.branches",
+          "when": "view == st-git.graph",
+          "group": "navigation@0"
+        },
+        {
+          "command": "st-git.branches",
+          "when": "view == st-git.localChanges",
+          "group": "navigation@0"
         }
       ],
       "webview/context": [
         {
-          "command": "st-git.undoCommit",
+          "command": "st-git.checkoutCommit",
+          "when": "webviewId == st-git.graph && webviewSection == commit",
+          "group": "0_branch@0"
+        },
+        {
+          "command": "st-git.newBranch",
+          "when": "webviewId == st-git.graph && webviewSection == commit",
+          "group": "0_branch@1"
+        },
+        {
+          "command": "st-git.amendCommit",
           "when": "webviewId == st-git.graph && webviewSection == commit",
           "group": "1_git@0"
         },
         {
-          "command": "st-git.squash",
+          "command": "st-git.undoCommit",
           "when": "webviewId == st-git.graph && webviewSection == commit",
           "group": "1_git@1"
         },
         {
-          "command": "st-git.rebaseOnto",
+          "command": "st-git.squash",
           "when": "webviewId == st-git.graph && webviewSection == commit",
           "group": "1_git@2"
+        },
+        {
+          "command": "st-git.rebaseOnto",
+          "when": "webviewId == st-git.graph && webviewSection == commit",
+          "group": "1_git@3"
         }
       ],
       "commandPalette": [
@@ -112,6 +228,62 @@
         {
           "command": "st-git.openDiff",
           "when": "false"
+        },
+        {
+          "command": "st-git.acceptCurrent",
+          "when": "false"
+        },
+        {
+          "command": "st-git.acceptIncoming",
+          "when": "false"
+        },
+        {
+          "command": "st-git.openMerge",
+          "when": "false"
+        },
+        {
+          "command": "st-git.openLocalDiff",
+          "when": "false"
+        },
+        {
+          "command": "st-git.checkoutCommit",
+          "when": "false"
+        },
+        {
+          "command": "st-git.newBranch",
+          "when": "false"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "st-git.acceptCurrent",
+          "when": "view == st-git.conflicts && viewItem == conflict",
+          "group": "inline@1"
+        },
+        {
+          "command": "st-git.acceptIncoming",
+          "when": "view == st-git.conflicts && viewItem == conflict",
+          "group": "inline@2"
+        },
+        {
+          "command": "st-git.openMerge",
+          "when": "view == st-git.conflicts && viewItem == conflict",
+          "group": "inline@3"
+        },
+        {
+          "command": "st-git.acceptCurrent",
+          "when": "view == st-git.conflicts && viewItem == conflict",
+          "group": "1_resolve@1"
+        },
+        {
+          "command": "st-git.acceptIncoming",
+          "when": "view == st-git.conflicts && viewItem == conflict",
+          "group": "1_resolve@2"
+        },
+        {
+          "command": "st-git.openMerge",
+          "when": "view == st-git.conflicts && viewItem == conflict",
+          "group": "1_resolve@3"
         }
       ]
     }

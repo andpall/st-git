@@ -1,9 +1,9 @@
-import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import { repoGit } from '../api/git';
-import { confirmRewrite } from '../ui/confirm';
+import { confirmIfPushed } from '../ui/confirm';
+import { askCommitMessage } from '../ui/messageDialog';
 
 const SEQUENCE_EDITOR_SCRIPT = path.join(__dirname, 'seqEditor.js');
 const RUN_VSCODE_AS_NODE = { ELECTRON_RUN_AS_NODE: '1' };
@@ -34,9 +34,17 @@ async function ensureNoMerges(base: string) {
   if (merges.trim()) throw new Error('Cannot squash: there are merge commits between the selection and HEAD.');
 }
 
-async function askMessage(count: number, oldest: string) {
-  const subject = await repoGit(['log', '-1', '--format=%s', oldest]);
-  return vscode.window.showInputBox({ prompt: `Message for the squashed commit (${count} commits)`, value: subject.trim() });
+function trimText(text: string) {
+  return text.trim();
+}
+
+async function combinedMessage(selection: string[]) {
+  const oldestFirst = [...selection].reverse();
+  const output = await repoGit(['log', '--no-walk=unsorted', '--format=%B%x00', ...oldestFirst]);
+  const messages = output.split('\0');
+  const trimmed = messages.map(trimText);
+  const nonEmpty = trimmed.filter(Boolean);
+  return nonEmpty.join('\n\n');
 }
 
 async function squashWithRebase(selection: string[], base: string, message: string) {
@@ -58,8 +66,9 @@ export async function squash(selection: string[]) {
   await ensureAllOnCurrentBranch(selection);
   const base = await parentOf(oldest);
   await ensureNoMerges(base);
-  const message = await askMessage(selection.length, oldest);
+  const title = `Squash ${selection.length} commits`;
+  const message = await askCommitMessage({ title, action: 'Squash', text: await combinedMessage(selection) });
   if (!message) return;
-  const confirmed = await confirmRewrite(`Squash ${selection.length} commits?`, oldest);
+  const confirmed = await confirmIfPushed(`${title}?`, oldest);
   if (confirmed) await squashWithRebase(selection, base, message);
 }

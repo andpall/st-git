@@ -1,5 +1,5 @@
 import { repoGit } from '../../api/git';
-import { parseNameStatus, type Change } from './nameStatus';
+import { parseNameStatus, type Change } from '../../utils/nameStatus';
 
 async function firstParent(hash: string) {
   const output = await repoGit(['rev-list', '--parents', '-n', '1', hash]);

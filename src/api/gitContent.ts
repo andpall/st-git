@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { repoGit } from '../../api/git';
+import { repoGit } from './git';
 
 const GIT_SCHEME = 'st-git';
 

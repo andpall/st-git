@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { repoRoot } from '../../api/git';
+import { updateRebaseState } from '../../ui/rebaseState';
 import { layout } from './graph';
 import { readLog } from './readLog';
 
@@ -56,6 +57,7 @@ async function handleVisibilityChange() {
 }
 
 export async function refreshGitLog() {
+  await updateRebaseState();
   if (!view) return;
   try {
     const root = await repoRoot();

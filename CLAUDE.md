@@ -43,12 +43,16 @@ const commits = nonEmpty.map(parseCommitLine);
 ```
 src/
   extension.ts   точка входа, регистрация команд
-  api/           общий доступ к git CLI
+  api/           общий доступ к git CLI и содержимому версий файлов (gitContent)
   ui/            общие диалоги VS Code
   commands/      команды над историей: по файлу на команду
+  utils/         общие чистые функции без vscode и git: парсеры вывода git, дерево файлов
   modules/       фичи: всё по фиче в одной папке (UI, чтение из git, чистые функции, tests/)
+    branches/    окно веток: checkout, новая ветка, Smart Checkout, ветка в статус-баре
+    commit/      Local Changes (файлы с галочками) и Commit (сообщение, Amend, кнопка Commit)
     log/         панель Log: provider, readLog, graph
     changes/     панель Changes: дерево файлов коммита, diff
+    conflicts/   панель Conflicts: список конфликтов при rebase, accept/merge
 webview/         JS/CSS для webview
 resources/       иконки
 scripts/         dev-скрипты (playground.sh создаёт тестовый репозиторий .playground)

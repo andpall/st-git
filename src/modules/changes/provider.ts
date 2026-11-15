@@ -1,10 +1,11 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { repoRoot } from '../../api/git';
-import { buildFileTree, type FileNode, type FolderNode, type TreeNode } from './fileTree';
+import { isMissingCommitError, repoRoot } from '../../api/git';
+import { buildFileTree, type FileNode, type FolderNode, type TreeNode } from '../../utils/fileTree';
 import { readChanges } from './readChanges';
 
 const SELECT_HINT = 'Select a commit in the Log to see its files.';
+const COMMIT_GONE = 'This commit no longer exists: the history was rewritten. Select a commit again.';
 const STATUS_LABELS: Record<string, string> = { A: 'added', M: 'modified', D: 'deleted', R: 'renamed', C: 'copied', T: 'type changed' };
 
 const treeChanged = new vscode.EventEmitter<void>();
@@ -67,6 +68,6 @@ export async function showCommitChanges(hashes: string[]) {
     const changes = await readChanges(commit);
     show(changes.length ? undefined : 'No file changes in this commit.', buildFileTree(changes));
   } catch (error) {
-    show((error as Error).message, []);
+    show(isMissingCommitError(error) ? COMMIT_GONE : (error as Error).message, []);
   }
 }

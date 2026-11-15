@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { gitUri } from './contentProvider';
-import type { Change } from './nameStatus';
+import { gitUri } from '../../api/gitContent';
+import type { Change } from '../../utils/nameStatus';
 
 export async function openDiff(hash: string, change: Change) {
   const before = gitUri(change.oldPath ?? change.path, `${hash}^`);

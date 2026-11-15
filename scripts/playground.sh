@@ -18,5 +18,8 @@ git tag v1.0
 git checkout -qb fix HEAD~1
 echo z > h; git add h; git commit -qm "hotfix"
 git checkout -q main
-for i in 6 7 8; do echo $i >> f; git add f; git commit -qm "main commit $i"; done
+for i in 6 7 8; do echo $i > "file$i"; git add "file$i"; git commit -qm "main commit $i"; done
+git checkout -qb conflicting main~6
+echo "conflicting line" > f; git add f; git commit -qm "conflicting change to f"
+git checkout -q main
 echo "playground created: $DIR"

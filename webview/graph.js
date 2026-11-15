@@ -114,11 +114,15 @@ function highlightRow(element) {
   element.classList.toggle('sel', isSelected(rows[element.dataset.i]));
 }
 
+function postSelection() {
+  const selectedRows = rows.filter(isSelected);
+  vscode.postMessage({ type: 'select', hashes: selectedRows.map(hashOf) });
+}
+
 function updateSelection() {
   const rowElements = list.querySelectorAll('.row');
   rowElements.forEach(highlightRow);
-  const selectedRows = rows.filter(isSelected);
-  vscode.postMessage({ type: 'select', hashes: selectedRows.map(hashOf) });
+  postSelection();
 }
 
 function selectRange(from, to) {
@@ -168,8 +172,10 @@ function handleMessage(event) {
   }
   rows = message.rows;
   const stillSelected = rows.filter(isSelected);
+  const selectionChanged = stillSelected.length !== selected.size;
   selected = new Set(stillSelected.map(hashOf));
   render();
+  if (selectionChanged) postSelection();
 }
 
 window.addEventListener('message', handleMessage);

@@ -11,3 +11,4 @@ body { padding: 0; margin: 0; font-family: var(--vscode-font-family); font-size:
 .ref { display: inline-block; line-height: 16px; padding: 0 5px; margin-right: 6px; border-radius: 3px; font-size: 11px;
   background: var(--vscode-badge-background); color: var(--vscode-badge-foreground); }
 .ref.tag { background: var(--vscode-charts-yellow); color: #000; }
+@media (max-width: 520px) { .author, .date { display: none; } }
