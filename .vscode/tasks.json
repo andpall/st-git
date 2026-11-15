@@ -1,4 +1,8 @@
 {
   "version": "2.0.0",
-  "tasks": [{ "type": "npm", "script": "compile", "group": "build", "problemMatcher": "$tsc" }]
+  "tasks": [
+    { "type": "npm", "script": "compile", "group": "build", "problemMatcher": "$tsc" },
+    { "label": "playground", "type": "shell", "command": "bash scripts/playground.sh", "problemMatcher": [] },
+    { "label": "prepare", "dependsOn": ["npm: compile", "playground"] }
+  ]
 }

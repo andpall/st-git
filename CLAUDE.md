@@ -1,0 +1,58 @@
+# st-git: правила кода
+
+## Без комментариев
+- Никаких комментариев в коде: ни `//`, ни `/* */`, ни JSDoc.
+- Если без комментария непонятно, переименуйте переменную или функцию либо вынесите кусок в функцию с говорящим именем.
+
+## Маленькие файлы
+- Не больше 200 строк в файле.
+- Подходит к лимиту, значит пора делить по смыслу на несколько файлов в той же папке.
+
+## Без цепочек вызовов
+- Не больше одного вызова метода подряд: никаких `a.split().filter().map()`.
+- Промежуточный результат кладите в переменную с понятным именем.
+- В `map`, `filter`, `forEach` и т.д. передавайте именованную функцию, а не инлайн-лямбду.
+
+## async/await вместо then
+- Никаких `.then()` и `.catch()` у промисов: только `async`/`await` и `try`/`catch`.
+
+```ts
+// плохо
+await repoGit(['merge-base', '--is-ancestor', newest, 'HEAD'])
+  .catch(() => { throw new Error('Squash works only on commits of the current branch.'); });
+
+// хорошо
+try {
+  await repoGit(['merge-base', '--is-ancestor', newest, 'HEAD']);
+} catch {
+  throw new Error('Squash works only on commits of the current branch.');
+}
+```
+
+```ts
+// плохо
+const commits = out.split('\n').filter(Boolean).map(line => { /* ... */ });
+
+// хорошо
+const lines = out.split('\n');
+const nonEmpty = lines.filter(Boolean);
+const commits = nonEmpty.map(parseCommitLine);
+```
+
+## Структура
+```
+src/
+  extension.ts   точка входа, регистрация команд
+  api/           общий доступ к git CLI
+  ui/            общие диалоги VS Code
+  commands/      команды над историей: по файлу на команду
+  modules/       фичи: всё по фиче в одной папке (UI, чтение из git, чистые функции, tests/)
+    log/         панель Log: provider, readLog, graph
+    changes/     панель Changes: дерево файлов коммита, diff
+webview/         JS/CSS для webview
+resources/       иконки
+scripts/         dev-скрипты (playground.sh создаёт тестовый репозиторий .playground)
+```
+- Код, нужный только одной фиче, лежит в её модуле. В `api/`, `ui/` и `commands/` попадает только общее.
+- Тесты лежат в подпапке `tests/` рядом с кодом: `src/modules/log/tests/graph.test.ts`.
+- `npm test` собирает проект и запускает все `*.test.js`.

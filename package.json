@@ -1,7 +1,7 @@
 {
   "name": "st-git",
   "displayName": "st-git",
-  "description": "",
+  "description": "Android Studio-like git log: graph, undo commit, squash, rebase",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.90.0"
@@ -11,17 +11,117 @@
   ],
   "main": "./out/extension.js",
   "contributes": {
+    "viewsContainers": {
+      "panel": [
+        {
+          "id": "stGit",
+          "title": "Git Log",
+          "icon": "resources/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "stGit": [
+        {
+          "type": "webview",
+          "id": "st-git.graph",
+          "name": "Log"
+        },
+        {
+          "id": "st-git.changes",
+          "name": "Changes"
+        }
+      ]
+    },
     "commands": [
       {
-        "command": "st-git.helloWorld",
-        "title": "st-git: Hello World"
+        "command": "st-git.refresh",
+        "title": "Refresh",
+        "category": "st-git",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "st-git.undoCommit",
+        "title": "Undo Commit",
+        "category": "st-git"
+      },
+      {
+        "command": "st-git.squash",
+        "title": "Squash Commits",
+        "category": "st-git"
+      },
+      {
+        "command": "st-git.rebaseOnto",
+        "title": "Rebase Current Branch onto This",
+        "category": "st-git"
+      },
+      {
+        "command": "st-git.rebaseContinue",
+        "title": "Continue Rebase",
+        "category": "st-git"
+      },
+      {
+        "command": "st-git.rebaseAbort",
+        "title": "Abort Rebase",
+        "category": "st-git"
+      },
+      {
+        "command": "st-git.openDiff",
+        "title": "Open Diff",
+        "category": "st-git"
       }
-    ]
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "st-git.refresh",
+          "when": "view == st-git.graph",
+          "group": "navigation"
+        }
+      ],
+      "webview/context": [
+        {
+          "command": "st-git.undoCommit",
+          "when": "webviewId == st-git.graph && webviewSection == commit",
+          "group": "1_git@0"
+        },
+        {
+          "command": "st-git.squash",
+          "when": "webviewId == st-git.graph && webviewSection == commit",
+          "group": "1_git@1"
+        },
+        {
+          "command": "st-git.rebaseOnto",
+          "when": "webviewId == st-git.graph && webviewSection == commit",
+          "group": "1_git@2"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "st-git.undoCommit",
+          "when": "false"
+        },
+        {
+          "command": "st-git.squash",
+          "when": "false"
+        },
+        {
+          "command": "st-git.rebaseOnto",
+          "when": "false"
+        },
+        {
+          "command": "st-git.openDiff",
+          "when": "false"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./"
+    "watch": "tsc -watch -p ./",
+    "test": "npm run compile && node --test \"out/**/*.test.js\"",
+    "playground:reset": "bash scripts/playground.sh --reset"
   },
   "devDependencies": {
     "@types/node": "^26.6.6",

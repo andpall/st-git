@@ -1,0 +1,13 @@
+body { padding: 0; margin: 0; font-family: var(--vscode-font-family); font-size: var(--vscode-font-size); color: var(--vscode-foreground); user-select: none; }
+#list { position: relative; }
+.graph { position: absolute; top: 0; left: 0; pointer-events: none; }
+.row { display: flex; height: 24px; line-height: 24px; gap: 12px; padding-right: 8px; cursor: default; white-space: nowrap; }
+.row:hover { background: var(--vscode-list-hoverBackground); }
+.row.sel { background: var(--vscode-list-activeSelectionBackground); color: var(--vscode-list-activeSelectionForeground); }
+.row.head .subject { font-weight: bold; }
+.subject { flex: 1; overflow: hidden; text-overflow: ellipsis; }
+.author { width: 140px; overflow: hidden; text-overflow: ellipsis; opacity: .8; }
+.date { width: 150px; opacity: .8; }
+.ref { display: inline-block; line-height: 16px; padding: 0 5px; margin-right: 6px; border-radius: 3px; font-size: 11px;
+  background: var(--vscode-badge-background); color: var(--vscode-badge-foreground); }
+.ref.tag { background: var(--vscode-charts-yellow); color: #000; }
