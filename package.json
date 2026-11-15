@@ -1,13 +1,32 @@
 {
   "name": "st-git",
   "displayName": "st-git",
-  "description": "Android Studio-like git log: graph, undo commit, squash, rebase",
+  "description": "Full git client in the sidebar: commit graph, local changes, branches, stashes, squash, rebase and conflict resolution",
   "version": "0.0.1",
+  "publisher": "andpall",
+  "license": "MIT",
+  "icon": "resources/icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/andpall/st-git"
+  },
+  "sponsor": {
+    "url": "https://boosty.to/andpall"
+  },
   "engines": {
     "vscode": "^1.90.0"
   },
   "categories": [
-    "Other"
+    "SCM Providers"
+  ],
+  "keywords": [
+    "git",
+    "log",
+    "graph",
+    "rebase",
+    "squash",
+    "android studio",
+    "intellij"
   ],
   "main": "./out/extension.js",
   "contributes": {

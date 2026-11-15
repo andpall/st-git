@@ -5,3 +5,8 @@ tsconfig.json
 out/**/*.test.js
 .playground/**
 scripts/**
+CLAUDE.md
+.gitignore
+*.vsix
+resources/promo.png
+.github/**
