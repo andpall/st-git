@@ -102,6 +102,7 @@ export function changesFor(node?: TreeNode) {
 function updateDescription() {
   const checkedCount = checkedChanges().length;
   treeView.description = changes.length ? `${checkedCount} of ${changes.length} selected` : undefined;
+  treeView.badge = changes.length ? { value: changes.length, tooltip: `${changes.length} local changes` } : undefined;
 }
 
 export function currentRepoPath() {
