@@ -19,10 +19,21 @@ function compareNodes(a: TreeNode, b: TreeNode) {
   return a.name.localeCompare(b.name);
 }
 
-function sortTree(folder: FolderNode) {
+function compactFolder(folder: FolderNode) {
+  while (folder.children.length === 1 && folder.children[0].kind === 'folder') {
+    const onlyChild = folder.children[0];
+    folder.name = `${folder.name}/${onlyChild.name}`;
+    folder.path = onlyChild.path;
+    folder.children = onlyChild.children;
+  }
+}
+
+function arrangeTree(folder: FolderNode) {
   folder.children.sort(compareNodes);
   for (const child of folder.children) {
-    if (child.kind === 'folder') sortTree(child);
+    if (child.kind !== 'folder') continue;
+    compactFolder(child);
+    arrangeTree(child);
   }
 }
 
@@ -35,6 +46,6 @@ export function buildFileTree(changes: Change[]): TreeNode[] {
     for (const part of parts) folder = childFolder(folder, part);
     folder.children.push({ kind: 'file', name, path: change.path, change });
   }
-  sortTree(root);
+  arrangeTree(root);
   return root.children;
 }
