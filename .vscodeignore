@@ -10,3 +10,4 @@ CLAUDE.md
 *.vsix
 resources/promo.png
 .github/**
+.env

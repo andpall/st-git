@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.1
+
+- Changes and Local Changes: folders with a single subfolder are shown on one line, like `src/modules/log`
+- Activity Bar icon shows the number of local changes
+- "Add to .gitignore" in the Local Changes context menu for unversioned files and folders
+
 ## 0.1.0
 
 - Log: search by text or hash, filters by branch, user and date, "Load more commits"
