@@ -185,6 +185,11 @@
         "icon": "$(discard)"
       },
       {
+        "command": "st-git.addToGitignore",
+        "title": "Add to .gitignore",
+        "category": "st-git"
+      },
+      {
         "command": "st-git.stashChanges",
         "title": "Stash Changes...",
         "category": "st-git",
@@ -464,6 +469,10 @@
         {
           "command": "st-git.revealCommit",
           "when": "false"
+        },
+        {
+          "command": "st-git.addToGitignore",
+          "when": "false"
         }
       ],
       "view/item/context": [
@@ -499,13 +508,18 @@
         },
         {
           "command": "st-git.rollback",
-          "when": "view == st-git.localChanges && viewItem == localChange",
+          "when": "view == st-git.localChanges && viewItem =~ /^localChange/",
           "group": "inline"
         },
         {
           "command": "st-git.rollback",
-          "when": "view == st-git.localChanges && viewItem == localChange",
+          "when": "view == st-git.localChanges && viewItem =~ /^localChange/",
           "group": "1_change"
+        },
+        {
+          "command": "st-git.addToGitignore",
+          "when": "view == st-git.localChanges && viewItem =~ /\\bunversioned\\b/",
+          "group": "1_change@9"
         },
         {
           "command": "st-git.applyStash",

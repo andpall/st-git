@@ -15,6 +15,7 @@ import { registerLocalChanges, checkedChanges } from './modules/commit/localChan
 import { registerCommitPanel } from './modules/commit/commitPanel';
 import { openLocalDiff } from './modules/commit/openLocalDiff';
 import { rollback } from './modules/commit/rollback';
+import { addToGitignore } from './modules/commit/addToGitignore';
 import { registerBranchStatus } from './modules/branches/statusBar';
 import { showBranches } from './modules/branches/branchPicker';
 import { checkoutCommit, newBranchFromCommit } from './modules/branches/commitActions';
@@ -41,6 +42,7 @@ const GUARDED_COMMANDS: Record<string, (...args: never[]) => Promise<unknown>> =
   'st-git.newBranch': newBranchFromCommit,
   'st-git.compareWithCurrent': showComparison,
   'st-git.rollback': rollback,
+  'st-git.addToGitignore': addToGitignore,
   'st-git.stashChanges': stashChanges,
   'st-git.applyStash': applyStash,
   'st-git.popStash': popStash,

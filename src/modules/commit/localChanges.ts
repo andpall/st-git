@@ -34,6 +34,16 @@ function collectFiles(node: TreeNode, files: FileNode[]) {
   return files;
 }
 
+export function isUnversioned(change: Change) {
+  return change.status === '?';
+}
+
+function contextValueOf(node: TreeNode) {
+  const files = collectFiles(node, []);
+  const changesOfNode = files.map(changeOf);
+  return changesOfNode.every(isUnversioned) ? 'localChange unversioned' : 'localChange';
+}
+
 function isChecked(change: Change) {
   return !unchecked.has(change.path);
 }
@@ -73,14 +83,14 @@ function getTreeItem(node: TreeNode) {
     item.resourceUri = workspaceUri(node.path);
     item.iconPath = vscode.ThemeIcon.Folder;
     item.checkboxState = hasCheckedFile(node) ? Checked : Unchecked;
-    item.contextValue = 'localChange';
+    item.contextValue = contextValueOf(node);
     return item;
   }
   const item = new vscode.TreeItem(workspaceUri(node.path));
   item.iconPath = vscode.ThemeIcon.File;
   item.description = STATUS_LABELS[node.change.status] ?? node.change.status;
   item.checkboxState = isChecked(node.change) ? Checked : Unchecked;
-  item.contextValue = 'localChange';
+  item.contextValue = contextValueOf(node);
   item.command = { command: 'st-git.openLocalDiff', title: 'Open Diff', arguments: [node.change, repoPath] };
   return item;
 }
