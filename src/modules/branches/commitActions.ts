@@ -3,11 +3,12 @@ import { repoGit } from '../../api/git';
 import type { CommitContext } from '../log/provider';
 import { checkout } from './checkout';
 import { createBranch } from './createBranch';
+import { currentBranch } from '../../commands/branchInfo';
 
 const DETACHED_DETAIL = 'No local branch points to this commit. You will be in "detached HEAD" state: new commits will not belong to any branch.';
 
-async function branchesAt(hash: string) {
-  const output = await repoGit(['for-each-ref', '--points-at', hash, '--format=%(refname:short)', 'refs/heads']);
+async function branchesAt(hash: string, ...refPrefixes: string[]) {
+  const output = await repoGit(['for-each-ref', '--points-at', hash, '--format=%(refname:short)', ...refPrefixes]);
   const lines = output.split('\n');
   return lines.filter(Boolean);
 }
@@ -18,7 +19,7 @@ async function checkoutDetached(hash: string) {
 }
 
 export async function checkoutCommit({ hash }: CommitContext) {
-  const branches = await branchesAt(hash);
+  const branches = await branchesAt(hash, 'refs/heads');
   if (!branches.length) {
     await checkoutDetached(hash);
     return;
@@ -29,4 +30,20 @@ export async function checkoutCommit({ hash }: CommitContext) {
 
 export async function newBranchFromCommit({ hash }: CommitContext) {
   await createBranch(hash, `commit ${hash.slice(0, 8)}`);
+}
+
+function isMergeable(current: string) {
+  return function isOtherBranch(name: string) {
+    return name !== current && !name.endsWith('/HEAD');
+  };
+}
+
+export async function mergeCommit({ hash }: CommitContext) {
+  const current = await currentBranch();
+  const branches = await branchesAt(hash, 'refs/heads', 'refs/remotes');
+  const candidates = branches.filter(isMergeable(current));
+  const source = candidates.length > 1
+    ? await vscode.window.showQuickPick(candidates, { title: `Merge into '${current}'` })
+    : candidates[0] ?? hash;
+  if (source) await repoGit(['merge', '--no-edit', source]);
 }

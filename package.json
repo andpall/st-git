@@ -2,7 +2,7 @@
   "name": "st-git",
   "displayName": "st-git",
   "description": "Full git client in the sidebar: commit graph, local changes, branches, stashes, squash, rebase and conflict resolution",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "publisher": "andpall",
   "license": "MIT",
   "icon": "resources/icon.png",
@@ -96,6 +96,11 @@
       {
         "command": "st-git.rebaseOnto",
         "title": "Rebase Current Branch onto This",
+        "category": "st-git"
+      },
+      {
+        "command": "st-git.mergeCommit",
+        "title": "Merge into Current Branch",
         "category": "st-git"
       },
       {
@@ -380,6 +385,11 @@
           "group": "3_branch@9"
         },
         {
+          "command": "st-git.mergeCommit",
+          "when": "webviewId == st-git.graph && webviewSection == commit",
+          "group": "3_branch@9"
+        },
+        {
           "command": "st-git.resetToHere",
           "when": "webviewId == st-git.graph && webviewSection == commit",
           "group": "3_branch@10"
@@ -472,6 +482,10 @@
         },
         {
           "command": "st-git.addToGitignore",
+          "when": "false"
+        },
+        {
+          "command": "st-git.mergeCommit",
           "when": "false"
         }
       ],

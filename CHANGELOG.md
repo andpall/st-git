@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.2
+
+- "Merge into Current Branch" in the Log commit context menu
+
 ## 0.1.1
 
 - Changes and Local Changes: folders with a single subfolder are shown on one line, like `src/modules/log`

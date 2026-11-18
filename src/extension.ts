@@ -18,7 +18,7 @@ import { rollback } from './modules/commit/rollback';
 import { addToGitignore } from './modules/commit/addToGitignore';
 import { registerBranchStatus } from './modules/branches/statusBar';
 import { showBranches } from './modules/branches/branchPicker';
-import { checkoutCommit, newBranchFromCommit } from './modules/branches/commitActions';
+import { checkoutCommit, mergeCommit, newBranchFromCommit } from './modules/branches/commitActions';
 import { registerStashes } from './modules/stash/provider';
 import { applyStash, dropStash, popStash, stashChanges } from './modules/stash/actions';
 import { commitChanges } from './commands/commitChanges';
@@ -56,6 +56,7 @@ const GUARDED_COMMANDS: Record<string, (...args: never[]) => Promise<unknown>> =
   'st-git.revertCommit': revertCommit,
   'st-git.resetToHere': resetToHere,
   'st-git.rebaseOnto': rebaseOnto,
+  'st-git.mergeCommit': mergeCommit,
   'st-git.continueOperation': continueOperation,
   'st-git.abortOperation': abortOperation,
   'st-git.push': push,
