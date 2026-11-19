@@ -18,6 +18,7 @@ import { rollback } from './modules/commit/rollback';
 import { addToGitignore } from './modules/commit/addToGitignore';
 import { registerBranchStatus } from './modules/branches/statusBar';
 import { showBranches } from './modules/branches/branchPicker';
+import { setBranchStorage } from './modules/branches/favorites';
 import { checkoutCommit, mergeCommit, newBranchFromCommit, rebaseOntoBranch } from './modules/branches/commitActions';
 import { registerStashes } from './modules/stash/provider';
 import { applyStash, dropStash, popStash, stashChanges } from './modules/stash/actions';
@@ -75,6 +76,7 @@ const GUARDED_COMMANDS: Record<string, (...args: never[]) => Promise<unknown>> =
 
 export async function activate(context: vscode.ExtensionContext) {
   setDialogAssets(context.extensionUri);
+  setBranchStorage(context.workspaceState);
   context.subscriptions.push(await startAskpass(context.globalStorageUri.fsPath));
   context.subscriptions.push(
     registerGitContent(),
