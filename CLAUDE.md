@@ -58,6 +58,7 @@ src/
     changes/     панель Changes: дерево файлов коммита, diff
     conflicts/   панель Conflicts: конфликты при rebase/merge/cherry-pick/revert/stash, accept/merge
     stash/       панель Stashes: список, файлы, apply/pop/drop
+    push/        окно Push: куда пушить, список коммитов, теги, force push
     tags/        теги из Log: создать, запушить, удалить
 webview/         JS/CSS для webview (log/ разбит на файлы, общие переменные в state.js)
 resources/       иконки

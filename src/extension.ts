@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { registerGitContent } from './api/gitContent';
 import { startAskpass } from './api/askpass';
-import { setDialogAssets } from './ui/messageDialog';
+import { setDialogAssets } from './ui/dialogPanel';
 import { guarded } from './guarded';
 import { refreshAll, watchRepository } from './refresh';
 import { registerGitLog, getSelection, revealCommit } from './modules/log/provider';
@@ -32,7 +32,7 @@ import { cherryPick, revertCommit } from './commands/cherryPick';
 import { resetToHere } from './commands/resetToHere';
 import { rebaseOnto } from './commands/rebase';
 import { continueOperation, abortOperation } from './commands/operation';
-import { push } from './commands/push';
+import { push } from './modules/push/push';
 import { pull, fetchAll } from './commands/pull';
 
 const GUARDED_COMMANDS: Record<string, (...args: never[]) => Promise<unknown>> = {
