@@ -18,13 +18,23 @@ function createSubject(row) {
   return subject;
 }
 
+function isBranchRef(ref) {
+  return !ref.startsWith('tag: ') && !ref.startsWith('HEAD') && !ref.endsWith('/HEAD');
+}
+
+function hasBranchRef(row) {
+  const refs = row.refs ? row.refs.split(', ') : [];
+  return refs.some(isBranchRef);
+}
+
 function createRow(row, index) {
   const element = document.createElement('div');
   const headClass = /\bHEAD\b/.test(row.refs) ? ' head' : '';
   const selectedClass = isSelected(row) ? ' sel' : '';
   element.className = 'row' + selectedClass + headClass;
   element.dataset.i = index;
-  element.dataset.vscodeContext = JSON.stringify({ webviewSection: 'commit', hash: row.hash, preventDefaultContextMenuItems: true });
+  const context = { webviewSection: 'commit', hash: row.hash, hasBranch: hasBranchRef(row), preventDefaultContextMenuItems: true };
+  element.dataset.vscodeContext = JSON.stringify(context);
   const date = new Date(row.date * 1000);
   element.append(createSubject(row), createCell('author', row.author), createCell('date', date.toLocaleString(undefined, DATE_FORMAT)));
   return element;

@@ -99,6 +99,11 @@
         "category": "st-git"
       },
       {
+        "command": "st-git.rebaseOntoBranch",
+        "title": "Rebase Current Branch onto Branch...",
+        "category": "st-git"
+      },
+      {
         "command": "st-git.mergeCommit",
         "title": "Merge into Current Branch",
         "category": "st-git"
@@ -380,6 +385,11 @@
           "group": "2_apply@8"
         },
         {
+          "command": "st-git.rebaseOntoBranch",
+          "when": "webviewId == st-git.graph && webviewSection == commit && hasBranch",
+          "group": "3_branch@9"
+        },
+        {
           "command": "st-git.rebaseOnto",
           "when": "webviewId == st-git.graph && webviewSection == commit",
           "group": "3_branch@9"
@@ -486,6 +496,10 @@
         },
         {
           "command": "st-git.mergeCommit",
+          "when": "false"
+        },
+        {
+          "command": "st-git.rebaseOntoBranch",
           "when": "false"
         }
       ],

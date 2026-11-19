@@ -4,6 +4,7 @@ import type { CommitContext } from '../log/provider';
 import { checkout } from './checkout';
 import { createBranch } from './createBranch';
 import { currentBranch } from '../../commands/branchInfo';
+import { rebaseOntoRef } from '../../commands/rebase';
 
 const DETACHED_DETAIL = 'No local branch points to this commit. You will be in "detached HEAD" state: new commits will not belong to any branch.';
 
@@ -32,18 +33,33 @@ export async function newBranchFromCommit({ hash }: CommitContext) {
   await createBranch(hash, `commit ${hash.slice(0, 8)}`);
 }
 
-function isMergeable(current: string) {
-  return function isOtherBranch(name: string) {
+function isOtherBranch(current: string) {
+  return function isOther(name: string) {
     return name !== current && !name.endsWith('/HEAD');
   };
 }
 
+async function otherBranchesAt(hash: string, current: string) {
+  const branches = await branchesAt(hash, 'refs/heads', 'refs/remotes');
+  return branches.filter(isOtherBranch(current));
+}
+
+async function pickBranch(candidates: string[], title: string) {
+  if (candidates.length > 1) return vscode.window.showQuickPick(candidates, { title });
+  return candidates[0];
+}
+
 export async function mergeCommit({ hash }: CommitContext) {
   const current = await currentBranch();
-  const branches = await branchesAt(hash, 'refs/heads', 'refs/remotes');
-  const candidates = branches.filter(isMergeable(current));
-  const source = candidates.length > 1
-    ? await vscode.window.showQuickPick(candidates, { title: `Merge into '${current}'` })
-    : candidates[0] ?? hash;
+  const candidates = await otherBranchesAt(hash, current);
+  const source = candidates.length ? await pickBranch(candidates, `Merge into '${current}'`) : hash;
   if (source) await repoGit(['merge', '--no-edit', source]);
+}
+
+export async function rebaseOntoBranch({ hash }: CommitContext) {
+  const current = await currentBranch();
+  const candidates = await otherBranchesAt(hash, current);
+  if (!candidates.length) throw new Error('No other branch points to this commit.');
+  const target = await pickBranch(candidates, `Rebase '${current}' onto`);
+  if (target) await rebaseOntoRef(target, `'${target}'`);
 }
