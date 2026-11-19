@@ -1,6 +1,8 @@
 import { repoGit } from '../../api/git';
 import { currentBranch, upstreamOf } from '../../commands/branchInfo';
+import { ensureOnCurrentBranch } from '../../commands/historyRewrite';
 import { pull } from '../../commands/pull';
+import type { CommitContext } from '../log/provider';
 import { listRemotes, planPush } from './pushPlan';
 import { showPushDialog, type PushChoice } from './pushDialog';
 
@@ -43,3 +45,7 @@ export async function push() {
   await openPush('HEAD', `"${branch}"`);
 }
 
+export async function pushUpToHere({ hash }: CommitContext) {
+  await ensureOnCurrentBranch(hash, 'Push up to here');
+  await openPush(hash, `up to ${hash.slice(0, 8)}`);
+}

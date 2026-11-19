@@ -177,6 +177,11 @@
         "icon": "$(arrow-up)"
       },
       {
+        "command": "st-git.pushUpToHere",
+        "title": "Push All up to Here...",
+        "category": "st-git"
+      },
+      {
         "command": "st-git.pull",
         "title": "Pull...",
         "category": "st-git",
@@ -390,6 +395,11 @@
           "group": "1_edit@6"
         },
         {
+          "command": "st-git.pushUpToHere",
+          "when": "webviewId == st-git.graph && webviewSection == commit",
+          "group": "2_apply@6"
+        },
+        {
           "command": "st-git.cherryPick",
           "when": "webviewId == st-git.graph && webviewSection == commit",
           "group": "2_apply@7"
@@ -542,6 +552,10 @@
         },
         {
           "command": "st-git.deleteTag",
+          "when": "false"
+        },
+        {
+          "command": "st-git.pushUpToHere",
           "when": "false"
         }
       ],

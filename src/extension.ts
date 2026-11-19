@@ -32,7 +32,7 @@ import { cherryPick, revertCommit } from './commands/cherryPick';
 import { resetToHere } from './commands/resetToHere';
 import { rebaseOnto } from './commands/rebase';
 import { continueOperation, abortOperation } from './commands/operation';
-import { push } from './modules/push/push';
+import { push, pushUpToHere } from './modules/push/push';
 import { pull, fetchAll } from './commands/pull';
 
 const GUARDED_COMMANDS: Record<string, (...args: never[]) => Promise<unknown>> = {
@@ -65,6 +65,7 @@ const GUARDED_COMMANDS: Record<string, (...args: never[]) => Promise<unknown>> =
   'st-git.continueOperation': continueOperation,
   'st-git.abortOperation': abortOperation,
   'st-git.push': push,
+  'st-git.pushUpToHere': pushUpToHere,
   'st-git.pull': pull,
   'st-git.fetch': fetchAll,
   'st-git.toggleBlame': toggleBlame,
