@@ -9,8 +9,7 @@ function createCell(className, text) {
 
 function createSubject(row) {
   const subject = createCell('subject', '');
-  const refs = row.refs ? row.refs.split(', ') : [];
-  for (const ref of refs) {
+  for (const ref of refsOf(row)) {
     const badgeClass = ref.startsWith('tag: ') ? 'ref tag' : 'ref';
     subject.append(createCell(badgeClass, ref));
   }
@@ -22,9 +21,22 @@ function isBranchRef(ref) {
   return !ref.startsWith('tag: ') && !ref.startsWith('HEAD') && !ref.endsWith('/HEAD');
 }
 
+function refsOf(row) {
+  return row.refs ? row.refs.split(', ') : [];
+}
+
 function hasBranchRef(row) {
-  const refs = row.refs ? row.refs.split(', ') : [];
+  const refs = refsOf(row);
   return refs.some(isBranchRef);
+}
+
+function isTagRef(ref) {
+  return ref.startsWith('tag: ');
+}
+
+function hasTagRef(row) {
+  const refs = refsOf(row);
+  return refs.some(isTagRef);
 }
 
 function createRow(row, index) {
@@ -33,7 +45,7 @@ function createRow(row, index) {
   const selectedClass = isSelected(row) ? ' sel' : '';
   element.className = 'row' + selectedClass + headClass;
   element.dataset.i = index;
-  const context = { webviewSection: 'commit', hash: row.hash, hasBranch: hasBranchRef(row), preventDefaultContextMenuItems: true };
+  const context = { webviewSection: 'commit', hash: row.hash, hasBranch: hasBranchRef(row), hasTag: hasTagRef(row), preventDefaultContextMenuItems: true };
   element.dataset.vscodeContext = JSON.stringify(context);
   const date = new Date(row.date * 1000);
   element.append(createSubject(row), createCell('author', row.author), createCell('date', date.toLocaleString(undefined, DATE_FORMAT)));

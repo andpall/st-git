@@ -268,6 +268,21 @@
         "command": "st-git.revealCommit",
         "title": "Show Commit in Log",
         "category": "st-git"
+      },
+      {
+        "command": "st-git.newTag",
+        "title": "New Tag...",
+        "category": "st-git"
+      },
+      {
+        "command": "st-git.pushTag",
+        "title": "Push Tag...",
+        "category": "st-git"
+      },
+      {
+        "command": "st-git.deleteTag",
+        "title": "Delete Tag...",
+        "category": "st-git"
       }
     ],
     "menus": {
@@ -403,6 +418,21 @@
           "command": "st-git.resetToHere",
           "when": "webviewId == st-git.graph && webviewSection == commit",
           "group": "3_branch@10"
+        },
+        {
+          "command": "st-git.newTag",
+          "when": "webviewId == st-git.graph && webviewSection == commit",
+          "group": "4_tag@1"
+        },
+        {
+          "command": "st-git.pushTag",
+          "when": "webviewId == st-git.graph && webviewSection == commit && hasTag",
+          "group": "4_tag@2"
+        },
+        {
+          "command": "st-git.deleteTag",
+          "when": "webviewId == st-git.graph && webviewSection == commit && hasTag",
+          "group": "4_tag@3"
         }
       ],
       "commandPalette": [
@@ -500,6 +530,18 @@
         },
         {
           "command": "st-git.rebaseOntoBranch",
+          "when": "false"
+        },
+        {
+          "command": "st-git.newTag",
+          "when": "false"
+        },
+        {
+          "command": "st-git.pushTag",
+          "when": "false"
+        },
+        {
+          "command": "st-git.deleteTag",
           "when": "false"
         }
       ],

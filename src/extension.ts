@@ -21,6 +21,7 @@ import { showBranches } from './modules/branches/branchPicker';
 import { checkoutCommit, mergeCommit, newBranchFromCommit, rebaseOntoBranch } from './modules/branches/commitActions';
 import { registerStashes } from './modules/stash/provider';
 import { applyStash, dropStash, popStash, stashChanges } from './modules/stash/actions';
+import { deleteTag, newTag, pushTag } from './modules/tags/tagActions';
 import { commitChanges } from './commands/commitChanges';
 import { undoCommit } from './commands/undoCommit';
 import { amendCommit } from './commands/amendCommit';
@@ -58,6 +59,9 @@ const GUARDED_COMMANDS: Record<string, (...args: never[]) => Promise<unknown>> =
   'st-git.rebaseOnto': rebaseOnto,
   'st-git.mergeCommit': mergeCommit,
   'st-git.rebaseOntoBranch': rebaseOntoBranch,
+  'st-git.newTag': newTag,
+  'st-git.pushTag': pushTag,
+  'st-git.deleteTag': deleteTag,
   'st-git.continueOperation': continueOperation,
   'st-git.abortOperation': abortOperation,
   'st-git.push': push,
