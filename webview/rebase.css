@@ -1,0 +1,17 @@
+.dialog.rebase { width: min(820px, 94vw); }
+.toolbar { display: flex; align-items: center; gap: 6px; }
+.toolbar button { padding: 2px 10px; }
+.commits { max-height: 45vh; min-height: 80px; overflow: auto; border-radius: 4px; border: 1px solid var(--vscode-widget-border, var(--vscode-panel-border)); }
+.commits:focus { outline: 1px solid var(--vscode-focusBorder); }
+.commit { display: flex; align-items: center; gap: 10px; padding: 2px 8px; white-space: nowrap; cursor: default; }
+.commit:hover { background: var(--vscode-list-hoverBackground); }
+.commit.sel { background: var(--vscode-list-activeSelectionBackground); color: var(--vscode-list-activeSelectionForeground); }
+.commit select { padding: 1px 4px; border-radius: 3px; font: inherit; color: var(--vscode-dropdown-foreground); background: var(--vscode-dropdown-background); border: 1px solid var(--vscode-dropdown-border, transparent); }
+.commit .hash { font-family: var(--vscode-editor-font-family); opacity: .7; }
+.commit .subject { flex: 1; overflow: hidden; text-overflow: ellipsis; }
+.commit .author, .commit .date { opacity: .7; }
+.commit.squash .subject, .commit.fixup .subject { padding-left: 16px; opacity: .8; }
+.commit.drop .subject, .commit.drop .hash { text-decoration: line-through; opacity: .5; }
+.commit.reword .subject { font-style: italic; }
+textarea[readonly] { opacity: .7; }
+.problem { color: var(--vscode-errorForeground); font-size: 12px; }

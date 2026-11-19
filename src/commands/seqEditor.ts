@@ -1,10 +1,16 @@
 import * as fs from 'fs';
 import { dropTodo, rewordTodo, squashTodo } from './todoRewrites';
+import { applyPlan } from '../modules/rebase/rebasePlan';
+
+function planTodo(todo: string, _hashes: string[], planFile: string) {
+  return applyPlan(todo, fs.readFileSync(planFile, 'utf8'));
+}
 
 const REWRITES: Record<string, (todo: string, hashes: string[], msgFile: string) => string> = {
   squash: squashTodo,
   reword: rewordTodo,
   drop: dropTodo,
+  plan: planTodo,
 };
 
 if (require.main === module) {

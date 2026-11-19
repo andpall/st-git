@@ -29,8 +29,11 @@ export async function ensureNoMergesSince(start: string[]) {
   if (merges.trim()) throw new Error('Cannot rewrite history: there are merge commits between this commit and HEAD.');
 }
 
+let messageFileCount = 0;
+
 export function writeMessageFile(message: string) {
-  const msgFile = path.join(os.tmpdir(), `st-git-msg-${Date.now()}.txt`);
+  messageFileCount++;
+  const msgFile = path.join(os.tmpdir(), `st-git-msg-${process.pid}-${Date.now()}-${messageFileCount}.txt`);
   fs.writeFileSync(msgFile, message);
   return msgFile;
 }

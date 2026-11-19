@@ -23,6 +23,7 @@ import { checkoutCommit, mergeCommit, newBranchFromCommit, rebaseOntoBranch } fr
 import { registerStashes } from './modules/stash/provider';
 import { applyStash, dropStash, popStash, stashChanges } from './modules/stash/actions';
 import { deleteTag, newTag, pushTag } from './modules/tags/tagActions';
+import { interactiveRebase } from './modules/rebase/interactiveRebase';
 import { commitChanges } from './commands/commitChanges';
 import { undoCommit } from './commands/undoCommit';
 import { amendCommit } from './commands/amendCommit';
@@ -58,6 +59,7 @@ const GUARDED_COMMANDS: Record<string, (...args: never[]) => Promise<unknown>> =
   'st-git.revertCommit': revertCommit,
   'st-git.resetToHere': resetToHere,
   'st-git.rebaseOnto': rebaseOnto,
+  'st-git.interactiveRebase': interactiveRebase,
   'st-git.mergeCommit': mergeCommit,
   'st-git.rebaseOntoBranch': rebaseOntoBranch,
   'st-git.newTag': newTag,

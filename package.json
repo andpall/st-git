@@ -94,6 +94,11 @@
         "category": "st-git"
       },
       {
+        "command": "st-git.interactiveRebase",
+        "title": "Interactively Rebase from Here...",
+        "category": "st-git"
+      },
+      {
         "command": "st-git.rebaseOnto",
         "title": "Rebase Current Branch onto This",
         "category": "st-git"
@@ -395,6 +400,11 @@
           "group": "1_edit@6"
         },
         {
+          "command": "st-git.interactiveRebase",
+          "when": "webviewId == st-git.graph && webviewSection == commit",
+          "group": "1_edit@7"
+        },
+        {
           "command": "st-git.pushUpToHere",
           "when": "webviewId == st-git.graph && webviewSection == commit",
           "group": "2_apply@6"
@@ -556,6 +566,10 @@
         },
         {
           "command": "st-git.pushUpToHere",
+          "when": "false"
+        },
+        {
+          "command": "st-git.interactiveRebase",
           "when": "false"
         }
       ],

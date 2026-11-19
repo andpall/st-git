@@ -8,6 +8,7 @@
 - Push dialog: target remote and branch, list of outgoing commits, push tags, Force Push and Pull First when the remote has new commits
 - "Push All up to Here..." in the Log commit context menu
 - Branches popup: ↑/↓ counts of unpushed and incoming commits, favorite branches (★) on top, branches grouped by prefix (feature/…) and by remote
+- "Interactively Rebase from Here...": reorder commits and pick, reword, edit, squash, fixup or drop each one in a dialog
 - Log graph width fits the branches visible on screen and is capped at 8 lanes by default
 - Log columns (graph, author, date) are resizable by dragging the dividers; widths are remembered
 - Log shows commit time without seconds; author and date are hidden in panels narrower than 480px (was 520px)
