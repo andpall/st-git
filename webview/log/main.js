@@ -28,4 +28,5 @@ window.addEventListener('message', handleMessage);
 list.addEventListener('click', handleClick);
 list.addEventListener('contextmenu', handleContextMenu);
 listenToToolbar();
+listenToColumnResize();
 vscode.postMessage({ type: 'ready' });

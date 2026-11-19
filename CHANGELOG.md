@@ -3,6 +3,9 @@
 ## 0.1.2
 
 - "Merge into Current Branch" in the Log commit context menu
+- Log graph width fits the branches visible on screen and is capped at 8 lanes by default
+- Log columns (graph, author, date) are resizable by dragging the dividers; widths are remembered
+- Log shows commit time without seconds; author and date are hidden in panels narrower than 480px (was 520px)
 
 ## 0.1.1
 

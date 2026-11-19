@@ -47,7 +47,7 @@ function drawEdges(graph, row, index) {
 }
 
 function drawGraph(lanes) {
-  const graph = createSvg('svg', { width: lanes * LANE_WIDTH, height: rows.length * ROW_HEIGHT, class: 'graph' });
+  const graph = createSvg('svg', { width: lanes * LANE_WIDTH, height: rows.length * ROW_HEIGHT });
   if (!graphFiltered) {
     for (let i = 0; i < rows.length; i++) drawEdges(graph, rows[i], i);
   }
@@ -56,5 +56,8 @@ function drawGraph(lanes) {
     const dot = { cx: laneX(col), cy: rowY(i), r: 4, fill: laneColor(col) };
     graph.append(createSvg('circle', dot));
   }
-  return graph;
+  const clip = document.createElement('div');
+  clip.className = 'graph';
+  clip.append(graph);
+  return clip;
 }

@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 
-const SCRIPTS = ['state.js', 'graph.js', 'rows.js', 'details.js', 'selection.js', 'toolbar.js', 'main.js'];
+const SCRIPTS = ['state.js', 'graph.js', 'columns.js', 'rows.js', 'details.js', 'selection.js', 'toolbar.js', 'main.js'];
 const SINCE_OPTIONS = [
   ['', 'Any time'], ['1 day ago', 'Last 24 hours'], ['7 days ago', 'Last 7 days'], ['30 days ago', 'Last 30 days'], ['1 year ago', 'Last year'],
 ];
